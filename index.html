@@ -86,10 +86,10 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .count-btn { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
 
 /* FLASHCARD */
-.fc-wrap { perspective: 1400px; margin: 0 auto 24px; max-width: 560px; }
-.fc { width: 100%; aspect-ratio: 3/2; position: relative; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); cursor: pointer; border-radius: 22px; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); }
+.fc-wrap { perspective: 1400px; margin: 0 auto 24px; max-width: 560px; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); }
+.fc { width: 100%; aspect-ratio: 3/2; position: relative; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); cursor: pointer; border-radius: 22px; }
 .fc.flipped { transform: rotateY(180deg); }
-.fc-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px; text-align: center; overflow: hidden; }
+.fc-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px; text-align: center; overflow: hidden; transform: rotateY(0deg); }
 .fc-front { background: var(--surface); border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); }
 .fc-back { background: var(--ink); transform: rotateY(180deg); }
 .fc-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; color: var(--muted); font-weight: 600; flex-shrink: 0; }
