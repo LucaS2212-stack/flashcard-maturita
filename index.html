@@ -98,12 +98,8 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .fc-back .fc-subject { color: #f0b090; }
 .fc-content { font-family: 'Playfair Display', serif; font-size: clamp(0.95rem, 2.5vw, 1.35rem); line-height: 1.5; color: var(--ink); overflow-y: auto; max-height: 160px; width: 100%; text-align: left; }
 .fc-back .fc-content { color: var(--bg); }
-/* rich text in card */
 .fc-content ul, .fc-content ol { padding-left: 1.4em; }
 .fc-content li { margin-bottom: 2px; }
-.fc-content strong { font-weight: 700; }
-.fc-content em { font-style: italic; }
-.fc-content u { text-decoration: underline; }
 .fc-hint { margin-top: 10px; font-size: 0.78rem; color: var(--muted); flex-shrink: 0; }
 .fc-back .fc-hint { color: rgba(255,255,255,0.3); }
 
@@ -127,7 +123,7 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .results h2 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 8px; }
 .results .score { font-family: 'Playfair Display', serif; font-size: 4rem; color: var(--accent); line-height: 1; margin: 16px 0 8px; }
 .results .score-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 28px; }
-.results-breakdown { display: flex; gap: 12px; justify-content: center; margin-bottom: 28px; }
+.results-breakdown { display: flex; gap: 12px; justify-content: center; margin-bottom: 28px; flex-wrap: wrap; }
 .rb-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; text-align: center; }
 .rb-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; }
 .rb-label { font-size: 0.78rem; color: var(--muted); }
@@ -136,7 +132,7 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .results-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 .results-actions .btn { min-width: 140px; }
 
-/* MAZZI */
+/* DECK GRID */
 .deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
 .deck-tile { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: all 0.18s; position: relative; overflow: hidden; }
 .deck-tile::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--deck-color, var(--ink)); }
@@ -144,34 +140,58 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .deck-tile h3 { font-family: 'Playfair Display', serif; font-size: 1.05rem; margin-bottom: 4px; }
 .deck-tile .dc-meta { font-size: 0.8rem; color: var(--muted); }
 .deck-tile .dc-box { font-size: 0.78rem; margin-top: 6px; color: var(--accent); font-weight: 500; }
-.deck-del { position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 0.85rem; padding: 4px; border-radius: 6px; }
-.deck-del:hover { color: var(--accent); }
-.add-deck { background: var(--surface2); border: 2px dashed var(--border); border-radius: var(--radius); padding: 18px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
-.add-deck input { flex: 1; min-width: 150px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-family: 'Outfit', sans-serif; font-size: 0.95rem; color: var(--ink); outline: none; transition: border-color 0.2s; }
-.add-deck input:focus { border-color: var(--ink); }
-.add-deck input::placeholder { color: var(--muted); }
+.tile-del { position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 0.85rem; padding: 4px; border-radius: 6px; }
+.tile-del:hover { color: var(--accent); }
+
+/* BREADCRUMB */
+.breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.bc-item { font-size: 0.88rem; color: var(--muted); cursor: pointer; transition: color 0.15s; }
+.bc-item:hover { color: var(--ink); }
+.bc-item.current { color: var(--ink); font-weight: 600; cursor: default; }
+.bc-sep { color: var(--border); font-size: 0.8rem; }
+
+/* TOPICS */
+.topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.topic-tile { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: all 0.18s; position: relative; }
+.topic-tile:hover { border-color: var(--ink); box-shadow: 3px 3px 0 var(--ink); transform: translate(-1px,-1px); }
+.topic-tile h3 { font-family: 'Playfair Display', serif; font-size: 1rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.topic-meta { font-size: 0.78rem; color: var(--muted); display: flex; gap: 10px; }
+.topic-meta span { display: flex; align-items: center; gap: 3px; }
+
+/* ADD ROW */
+.add-row { background: var(--surface2); border: 2px dashed var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+.add-row input { flex: 1; min-width: 150px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-family: 'Outfit', sans-serif; font-size: 0.95rem; color: var(--ink); outline: none; transition: border-color 0.2s; }
+.add-row input:focus { border-color: var(--ink); }
+.add-row input::placeholder { color: var(--muted); }
 .color-dots { display: flex; gap: 7px; }
 .cdot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
 .cdot.sel { border-color: var(--ink); transform: scale(1.2); }
 
-/* EDITOR HEADER */
-.editor-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-.editor-header h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; flex: 1; }
-.editor-count { font-size: 0.82rem; color: var(--muted); }
-.card-form { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 20px; box-shadow: var(--shadow); }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-@media (max-width: 540px) { .form-grid { grid-template-columns: 1fr; } }
-.fg label { display: block; font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; font-weight: 500; }
-.form-footer { display: flex; justify-content: flex-end; }
+/* TOPIC VIEW */
+.topic-header { margin-bottom: 20px; }
+.topic-header h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 4px; }
+.topic-header p { color: var(--muted); font-size: 0.85rem; }
 
-/* RICH TEXT EDITOR */
+/* TABS inside topic */
+.topic-tabs { display: flex; gap: 6px; background: var(--surface2); border-radius: 50px; padding: 5px; margin-bottom: 20px; border: 1px solid var(--border); }
+.topic-tab { flex: 1; padding: 9px 12px; border: none; background: transparent; color: var(--muted); border-radius: 50px; font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.topic-tab.active { background: var(--ink); color: var(--bg); }
+
+/* PDF LIST */
+.pdf-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.pdf-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+.pdf-icon { font-size: 1.6rem; flex-shrink: 0; }
+.pdf-info { flex: 1; min-width: 0; }
+.pdf-name { font-weight: 500; font-size: 0.95rem; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pdf-url { font-size: 0.78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pdf-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+/* RICH TEXT */
 .rte-wrap { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface2); transition: border-color 0.2s; }
 .rte-wrap:focus-within { border-color: var(--ink); }
 .rte-toolbar { display: flex; gap: 2px; padding: 6px 8px; background: var(--surface); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
 .rte-btn { background: transparent; border: none; border-radius: 6px; padding: 5px 8px; cursor: pointer; font-size: 0.85rem; color: var(--muted); transition: all 0.15s; line-height: 1; font-family: inherit; }
 .rte-btn:hover { background: var(--surface2); color: var(--ink); }
-.rte-btn.active { background: var(--ink); color: var(--bg); }
-.rte-btn b { font-weight: 800; }
 .rte-sep { width: 1px; background: var(--border); margin: 2px 4px; }
 .rte-editor { min-height: 90px; padding: 11px 13px; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.95rem; color: var(--ink); line-height: 1.55; }
 .rte-editor ul, .rte-editor ol { padding-left: 1.4em; }
@@ -184,21 +204,24 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .ci-content { flex: 1; min-width: 0; }
 .ci-front { font-weight: 500; font-size: 0.95rem; margin-bottom: 5px; }
 .ci-back { color: var(--muted); font-size: 0.88rem; line-height: 1.45; }
-.ci-back ul, .ci-back ol { padding-left: 1.3em; }
-.ci-front ul, .ci-front ol { padding-left: 1.3em; }
+.ci-back ul, .ci-back ol, .ci-front ul, .ci-front ol { padding-left: 1.3em; }
 .ci-box { display: inline-block; font-size: 0.72rem; margin-top: 6px; padding: 2px 8px; border-radius: 20px; background: var(--surface2); color: var(--accent); font-weight: 500; }
 .ci-actions { display: flex; gap: 4px; flex-shrink: 0; }
 .icon-btn { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 6px; border-radius: 8px; font-size: 0.9rem; transition: all 0.15s; }
 .icon-btn:hover { background: var(--surface2); color: var(--ink); }
-.icon-btn.add-box { color: var(--accent); }
-.icon-btn.rem-box { color: var(--green); }
 .icon-btn.del:hover { color: var(--accent); }
-.icon-btn.edit:hover { color: var(--accent); }
 
-/* EDIT MODAL */
+/* FORM */
+.card-form { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 20px; box-shadow: var(--shadow); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+@media (max-width: 540px) { .form-grid { grid-template-columns: 1fr; } }
+.fg label { display: block; font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; font-weight: 500; }
+.form-footer { display: flex; justify-content: flex-end; margin-top: 12px; }
+
+/* MODAL */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); animation: fadeIn 0.2s ease; }
 @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-.modal { background: var(--surface); border: 2px solid var(--ink); border-radius: 20px; padding: 24px; width: 100%; max-width: 560px; box-shadow: 6px 6px 0 var(--ink); }
+.modal { background: var(--surface); border: 2px solid var(--ink); border-radius: 20px; padding: 24px; width: 100%; max-width: 560px; box-shadow: 6px 6px 0 var(--ink); max-height: 90vh; overflow-y: auto; }
 .modal h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 20px; }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
 
@@ -246,36 +269,43 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
   <p>Caricamento...</p>
 </div>
 
-<!-- EDIT MODAL -->
-<div class="modal-overlay" id="edit-modal" style="display:none" onclick="closeModal(event)">
+<!-- EDIT CARD MODAL -->
+<div class="modal-overlay" id="edit-modal" style="display:none" onclick="closeModal('edit-modal',event)">
   <div class="modal">
     <h3>✏️ Modifica carta</h3>
-    <div class="form-grid" style="margin-bottom:0">
+    <div class="form-grid">
+      <div class="fg"><label>Fronte</label><div class="rte-wrap"><div class="rte-toolbar" id="edit-tb-front"></div><div class="rte-editor" id="edit-front" data-placeholder="Fronte..." contenteditable="true"></div></div></div>
+      <div class="fg"><label>Retro</label><div class="rte-wrap"><div class="rte-toolbar" id="edit-tb-back"></div><div class="rte-editor" id="edit-back" data-placeholder="Retro..." contenteditable="true"></div></div></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModalDirect('edit-modal')">Annulla</button>
+      <button class="btn btn-primary" onclick="saveEdit()">💾 Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PDF MODAL -->
+<div class="modal-overlay" id="pdf-modal" style="display:none" onclick="closeModal('pdf-modal',event)">
+  <div class="modal">
+    <h3>📄 Aggiungi PDF</h3>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="fg"><label>Nome del documento</label><input type="text" id="pdf-name-input" placeholder="Es. Appunti Lentini" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-family:'Outfit',sans-serif;font-size:0.95rem;color:var(--ink);outline:none"></div>
       <div class="fg">
-        <label>Fronte — domanda</label>
-        <div class="rte-wrap" id="edit-wrap-front">
-          <div class="rte-toolbar" id="edit-tb-front"></div>
-          <div class="rte-editor" id="edit-front" data-placeholder="Fronte..." contenteditable="true"></div>
-        </div>
-      </div>
-      <div class="fg">
-        <label>Retro — risposta</label>
-        <div class="rte-wrap" id="edit-wrap-back">
-          <div class="rte-toolbar" id="edit-tb-back"></div>
-          <div class="rte-editor" id="edit-back" data-placeholder="Retro..." contenteditable="true"></div>
-        </div>
+        <label>Link Google Drive</label>
+        <input type="text" id="pdf-url-input" placeholder="https://drive.google.com/file/d/..." style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-family:'Outfit',sans-serif;font-size:0.95rem;color:var(--ink);outline:none">
+        <div style="font-size:0.78rem;color:var(--muted);margin-top:6px">Incolla il link di condivisione di Google Drive</div>
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeModalDirect()">Annulla</button>
-      <button class="btn btn-primary" onclick="saveEdit()">💾 Salva</button>
+      <button class="btn btn-secondary" onclick="closeModalDirect('pdf-modal')">Annulla</button>
+      <button class="btn btn-primary" onclick="savePdf()">+ Aggiungi</button>
     </div>
   </div>
 </div>
 
 <!-- APP -->
 <div class="app" id="app">
-  <nav id="main-nav">
+  <nav>
     <button class="nav-btn active" onclick="goTo('home')" id="nav-home"><span class="nav-icon">📦</span>Scatola</button>
     <button class="nav-btn" onclick="goTo('sfoglia')" id="nav-sfoglia"><span class="nav-icon">🔍</span>Sfoglia</button>
     <button class="nav-btn" onclick="goTo('mazzi')" id="nav-mazzi" style="display:none"><span class="nav-icon">📚</span>Mazzi</button>
@@ -299,14 +329,7 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
     </div>
     <div class="card" style="margin-bottom:16px">
       <div class="section-label">Quante carte per sessione?</div>
-      <div class="count-row">
-        <label>Carte da estrarre</label>
-        <div class="count-ctrl">
-          <button class="count-btn" onclick="changeCount(-1)">−</button>
-          <div class="count-num" id="session-count">5</div>
-          <button class="count-btn" onclick="changeCount(1)">+</button>
-        </div>
-      </div>
+      <div class="count-row"><label>Carte da estrarre</label><div class="count-ctrl"><button class="count-btn" onclick="changeCount(-1)">−</button><div class="count-num" id="session-count">5</div><button class="count-btn" onclick="changeCount(1)">+</button></div></div>
       <div style="font-size:0.82rem;color:var(--muted)">Estratte a caso dalla scatola.</div>
     </div>
     <div class="card"><div class="section-label">Riepilogo</div><div id="home-stats" style="display:flex;gap:12px;flex-wrap:wrap;"></div></div>
@@ -392,42 +415,15 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
     <div class="cards-list" id="browse-list"></div>
   </div>
 
-  <!-- MAZZI (admin) -->
+  <!-- MAZZI -->
   <div class="section" id="section-mazzi">
-    <div class="page-header"><h1>Mazzi</h1><p>Gestisci le carte per materia</p></div>
-    <div id="mazzi-view">
-      <div class="deck-grid" id="deck-grid"></div>
-      <div class="add-deck">
-        <input type="text" id="new-deck-input" placeholder="Nome mazzo (es. Letteratura...)" maxlength="40">
-        <div class="color-dots" id="cdots"></div>
-        <button class="btn btn-primary" onclick="addDeck()">+ Crea</button>
-      </div>
-    </div>
-    <div id="editor-view" style="display:none">
-      <div class="editor-header">
-        <button class="btn btn-secondary btn-sm" onclick="showMazziView()">← Indietro</button>
-        <h2 id="ed-title"></h2>
-        <span class="editor-count" id="ed-count"></span>
-      </div>
-      <div class="card-form">
-        <div class="section-label">Aggiungi carta</div>
-        <div class="form-grid">
-          <div class="fg">
-            <label>Fronte — domanda</label>
-            <div class="rte-wrap"><div class="rte-toolbar" id="tb-front"></div><div class="rte-editor" id="cf-front" data-placeholder="Es. Chi è Giacomo da Lentini?" contenteditable="true"></div></div>
-          </div>
-          <div class="fg">
-            <label>Retro — risposta</label>
-            <div class="rte-wrap"><div class="rte-toolbar" id="tb-back"></div><div class="rte-editor" id="cf-back" data-placeholder="Es. Poeta siciliano, inventore del sonetto..." contenteditable="true"></div></div>
-          </div>
-        </div>
-        <div class="form-footer" style="margin-top:12px"><button class="btn btn-primary" onclick="addCard()">+ Aggiungi carta</button></div>
-      </div>
-      <div class="cards-list" id="cards-list"></div>
-    </div>
+    <div class="page-header"><h1>Mazzi</h1><p id="mazzi-subtitle">Organizza le tue carte</p></div>
+    <div id="view-decks"></div>
+    <div id="view-topics" style="display:none"></div>
+    <div id="view-topic-detail" style="display:none"></div>
   </div>
 
-  <!-- BACKUP (admin) -->
+  <!-- BACKUP -->
   <div class="section" id="section-backup">
     <div class="page-header"><h1>Backup</h1><p>Esporta, importa e impostazioni</p></div>
     <div class="backup-btn" onclick="exportData()"><div class="backup-icon">📤</div><div class="backup-info"><h3>Esporta tutto (JSON)</h3><p>Scarica tutte le carte come file di backup</p></div></div>
@@ -436,14 +432,8 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
     <div class="card" style="margin-top:16px">
       <div class="section-label">Cambia codici di accesso</div>
       <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
-        <div>
-          <label style="font-size:0.82rem;color:var(--muted);display:block;margin-bottom:6px">Nuovo codice studente</label>
-          <div style="display:flex;gap:8px"><input type="password" id="new-student-code" placeholder="Nuovo codice..." class="code-input"><button class="btn btn-secondary" onclick="updateCode('student')">Salva</button></div>
-        </div>
-        <div>
-          <label style="font-size:0.82rem;color:var(--muted);display:block;margin-bottom:6px">Nuova password admin</label>
-          <div style="display:flex;gap:8px"><input type="password" id="new-admin-code" placeholder="Nuova password..." class="code-input"><button class="btn btn-secondary" onclick="updateCode('admin')">Salva</button></div>
-        </div>
+        <div><label style="font-size:0.82rem;color:var(--muted);display:block;margin-bottom:6px">Nuovo codice studente</label><div style="display:flex;gap:8px"><input type="password" id="new-student-code" placeholder="Nuovo codice..." class="code-input"><button class="btn btn-secondary" onclick="updateCode('student')">Salva</button></div></div>
+        <div><label style="font-size:0.82rem;color:var(--muted);display:block;margin-bottom:6px">Nuova password admin</label><div style="display:flex;gap:8px"><input type="password" id="new-admin-code" placeholder="Nuova password..." class="code-input"><button class="btn btn-secondary" onclick="updateCode('admin')">Salva</button></div></div>
       </div>
     </div>
   </div>
@@ -458,174 +448,146 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const COLORS = ['#c84b2f','#2f6bc8','#2a7a4b','#b85ad4','#d4882a','#2ab8b8'];
 let CODES = { student: 'STUDIA2025', admin: 'ADMIN2025' };
-let role = null;
-let decks = [];
-let sessionCount = 5, selectedColor = COLORS[0];
+let role = null, decks = [], sessionCount = 5, selectedColor = COLORS[0];
 let sessionCards = [], sessionIdx = 0, sessionCorrect = 0, sessionWrong = 0, sessionKeptOut = [];
-let isFlipped = false, currentDeckId = null, browseFilter = 'all', selectedRole = 'student';
-let editingCardId = null;
+let isFlipped = false, browseFilter = 'all', selectedRole = 'student';
+let currentDeckId = null, currentTopicId = null;
+let editingCardId = null, addingPdfTopicId = null;
+let activeTopicTab = 'cards';
 
-// ── RICH TEXT EDITOR ──────────────────────────────────────────────────────────
+// ── RTE ───────────────────────────────────────────────────────────────────────
 const RTE_TOOLS = [
-  { cmd: 'bold', label: '<b>B</b>', title: 'Grassetto' },
-  { cmd: 'italic', label: '<i>I</i>', title: 'Corsivo' },
-  { cmd: 'underline', label: '<u>U</u>', title: 'Sottolineato' },
-  { sep: true },
-  { cmd: 'insertUnorderedList', label: '• Lista', title: 'Lista puntata' },
-  { cmd: 'insertOrderedList', label: '1. Lista', title: 'Lista numerata' },
-  { sep: true },
-  { cmd: 'removeFormat', label: '✕ Stile', title: 'Rimuovi formattazione' },
+  {cmd:'bold',label:'<b>B</b>'},{cmd:'italic',label:'<i>I</i>'},{cmd:'underline',label:'<u>U</u>'},
+  {sep:true},{cmd:'insertUnorderedList',label:'• Lista'},{cmd:'insertOrderedList',label:'1. Lista'},
+  {sep:true},{cmd:'removeFormat',label:'✕'}
 ];
-
-function buildToolbar(tbId, editorId) {
-  const tb = document.getElementById(tbId);
-  tb.innerHTML = RTE_TOOLS.map((t, i) => {
-    if (t.sep) return '<div class="rte-sep"></div>';
-    return `<button class="rte-btn" title="${t.title}" onmousedown="event.preventDefault();execRTE('${t.cmd}','${editorId}')">${t.label}</button>`;
-  }).join('');
+function buildToolbar(tbId, edId) {
+  document.getElementById(tbId).innerHTML = RTE_TOOLS.map(t=>t.sep?'<div class="rte-sep"></div>':`<button class="rte-btn" title="${t.label}" onmousedown="event.preventDefault();execRTE('${t.cmd}','${edId}')">${t.label}</button>`).join('');
 }
-
-function execRTE(cmd, editorId) {
-  document.getElementById(editorId).focus();
-  document.execCommand(cmd, false, null);
-}
-
-function getRTEHtml(id) { return document.getElementById(id).innerHTML.trim(); }
-function setRTEHtml(id, html) { document.getElementById(id).innerHTML = html || ''; }
-function clearRTE(id) { document.getElementById(id).innerHTML = ''; }
-function isRTEEmpty(id) { return document.getElementById(id).innerText.trim() === ''; }
-
-// Build all toolbars on load
-function buildAllToolbars() {
-  buildToolbar('tb-front', 'cf-front');
-  buildToolbar('tb-back', 'cf-back');
-  buildToolbar('edit-tb-front', 'edit-front');
-  buildToolbar('edit-tb-back', 'edit-back');
+function execRTE(cmd,id){document.getElementById(id).focus();document.execCommand(cmd,false,null);}
+function getRTE(id){return document.getElementById(id).innerHTML.trim();}
+function setRTE(id,html){document.getElementById(id).innerHTML=html||'';}
+function clearRTE(id){document.getElementById(id).innerHTML='';}
+function isRTEEmpty(id){return !document.getElementById(id).innerText.trim();}
+function buildAllToolbars(){
+  buildToolbar('edit-tb-front','edit-front');
+  buildToolbar('edit-tb-back','edit-back');
+  // topic toolbars built dynamically
 }
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
-function selectRole(r) {
-  selectedRole = r;
-  document.getElementById('chip-student').classList.toggle('active', r === 'student');
-  document.getElementById('chip-admin').classList.toggle('active', r === 'admin');
-  document.getElementById('login-input').placeholder = r === 'admin' ? 'Password admin...' : 'Codice studente...';
+function selectRole(r){
+  selectedRole=r;
+  document.getElementById('chip-student').classList.toggle('active',r==='student');
+  document.getElementById('chip-admin').classList.toggle('active',r==='admin');
+  document.getElementById('login-input').placeholder=r==='admin'?'Password admin...':'Codice studente...';
 }
-
-async function tryLogin() {
-  const code = document.getElementById('login-input').value.trim();
-  const err = document.getElementById('login-error');
+async function tryLogin(){
+  const code=document.getElementById('login-input').value.trim();
+  const err=document.getElementById('login-error');
   await loadCodes();
-  if (selectedRole === 'admin' && code === CODES.admin) role = 'admin';
-  else if (selectedRole === 'student' && code === CODES.student) role = 'student';
-  else { err.textContent = 'Codice non corretto. Riprova.'; document.getElementById('login-input').value = ''; return; }
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('loader').style.display = 'flex';
+  if(selectedRole==='admin'&&code===CODES.admin) role='admin';
+  else if(selectedRole==='student'&&code===CODES.student) role='student';
+  else{err.textContent='Codice non corretto.';document.getElementById('login-input').value='';return;}
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('loader').style.display='flex';
   await loadAll();
-  document.getElementById('loader').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
+  document.getElementById('loader').style.display='none';
+  document.getElementById('app').style.display='block';
   applyRole(); buildAllToolbars(); renderHome(); renderColorDots();
 }
-
-document.getElementById('login-input').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
-
-function applyRole() {
-  const isAdmin = role === 'admin';
-  document.getElementById('admin-badge').style.display = isAdmin ? 'block' : 'none';
-  document.getElementById('nav-mazzi').style.display = isAdmin ? '' : 'none';
-  document.getElementById('nav-backup').style.display = isAdmin ? '' : 'none';
-  document.getElementById('btn-reset-box').style.display = isAdmin ? '' : 'none';
+document.getElementById('login-input').addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin();});
+function applyRole(){
+  const a=role==='admin';
+  document.getElementById('admin-badge').style.display=a?'block':'none';
+  document.getElementById('nav-mazzi').style.display=a?'':'none';
+  document.getElementById('nav-backup').style.display=a?'':'none';
+  document.getElementById('btn-reset-box').style.display=a?'':'none';
 }
-
-function logout() {
-  role = null;
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('login-input').value = '';
-  document.getElementById('login-error').textContent = '';
-  selectRole('student');
-}
+function logout(){role=null;document.getElementById('app').style.display='none';document.getElementById('login-screen').style.display='flex';document.getElementById('login-input').value='';document.getElementById('login-error').textContent='';selectRole('student');}
 
 // ── CODES ─────────────────────────────────────────────────────────────────────
-async function loadCodes() {
-  try {
-    const { data } = await sb.from('settings').select('*');
-    if (data) data.forEach(r => { if(r.key==='student_code') CODES.student=r.value; if(r.key==='admin_code') CODES.admin=r.value; });
-  } catch(e) {}
-}
-
-async function updateCode(type) {
-  const val = document.getElementById(type==='student'?'new-student-code':'new-admin-code').value.trim();
-  if (!val || val.length < 4) { toast('Codice troppo corto (min 4 caratteri)'); return; }
-  const key = type === 'student' ? 'student_code' : 'admin_code';
-  await sb.from('settings').upsert({ key, value: val }, { onConflict: 'key' });
-  CODES[type] = val;
-  document.getElementById(type==='student'?'new-student-code':'new-admin-code').value = '';
-  toast('✓ Codice aggiornato!');
+async function loadCodes(){try{const{data}=await sb.from('settings').select('*');if(data)data.forEach(r=>{if(r.key==='student_code')CODES.student=r.value;if(r.key==='admin_code')CODES.admin=r.value;});}catch(e){}}
+async function updateCode(type){
+  const val=document.getElementById(type==='student'?'new-student-code':'new-admin-code').value.trim();
+  if(!val||val.length<4){toast('Codice troppo corto!');return;}
+  await sb.from('settings').upsert({key:type==='student'?'student_code':'admin_code',value:val},{onConflict:'key'});
+  CODES[type]=val;document.getElementById(type==='student'?'new-student-code':'new-admin-code').value='';toast('✓ Codice aggiornato!');
 }
 
 // ── DB ────────────────────────────────────────────────────────────────────────
-async function loadAll() {
-  const { data: dr } = await sb.from('decks').select('*').order('created_at');
-  const { data: cr } = await sb.from('cards').select('*').order('created_at');
-  decks = (dr||[]).map(d => ({ ...d, cards: (cr||[]).filter(c=>c.deck_id===d.id).map(c=>({id:c.id,front:c.front,back:c.back,in_box:c.in_box})) }));
+async function loadAll(){
+  const[{data:dr},{data:tr},{data:cr},{data:pr}]=await Promise.all([
+    sb.from('decks').select('*').order('created_at'),
+    sb.from('topics').select('*').order('created_at'),
+    sb.from('cards').select('*').order('created_at'),
+    sb.from('pdfs').select('*').order('created_at'),
+  ]);
+  decks=(dr||[]).map(d=>({
+    ...d,
+    topics:(tr||[]).filter(t=>t.deck_id===d.id).map(t=>({
+      ...t,
+      cards:(cr||[]).filter(c=>c.topic_id===t.id).map(c=>({id:c.id,front:c.front,back:c.back,in_box:c.in_box})),
+      pdfs:(pr||[]).filter(p=>p.topic_id===t.id).map(p=>({id:p.id,name:p.name,url:p.url}))
+    }))
+  }));
 }
 
-function boxCards() { return decks.flatMap(d => d.cards.filter(c=>c.in_box).map(c=>({...c,deckId:d.id,deckName:d.name}))); }
-function totalCards() { return decks.reduce((a,d)=>a+d.cards.length,0); }
+function allCards(){return decks.flatMap(d=>d.topics.flatMap(t=>t.cards.map(c=>({...c,deckId:d.id,deckName:d.name,topicId:t.id,topicName:t.name}))));}
+function boxCards(){return allCards().filter(c=>c.in_box);}
+function totalCards(){return allCards().length;}
 
 // ── HOME ──────────────────────────────────────────────────────────────────────
-function renderHome() {
-  const box = boxCards(), total = totalCards();
-  document.getElementById('box-count').textContent = box.length;
-  document.getElementById('box-subtitle').textContent = box.length===0 ? 'Scatola vuota!' : 'Pronte per il ripasso';
-  document.getElementById('box-visual').style.setProperty('--fill-pct', (total>0?Math.round((box.length/total)*100):0)+'%');
-  document.getElementById('session-count').textContent = sessionCount;
-  document.getElementById('home-stats').innerHTML = [
-    {n:decks.length,l:'Mazzi'},{n:total,l:'Carte totali'},{n:box.length,l:'In scatola'},{n:total-box.length,l:'Fuori scatola'},
-  ].map(x=>`<div style="flex:1;min-width:100px;background:var(--surface2);border-radius:10px;padding:12px 14px"><div style="font-family:'Playfair Display',serif;font-size:1.6rem">${x.n}</div><div style="font-size:0.78rem;color:var(--muted)">${x.l}</div></div>`).join('');
+function renderHome(){
+  const box=boxCards(),total=totalCards();
+  document.getElementById('box-count').textContent=box.length;
+  document.getElementById('box-subtitle').textContent=box.length===0?'Scatola vuota!':'Pronte per il ripasso';
+  document.getElementById('box-visual').style.setProperty('--fill-pct',(total>0?Math.round((box.length/total)*100):0)+'%');
+  document.getElementById('session-count').textContent=sessionCount;
+  document.getElementById('home-stats').innerHTML=[
+    {n:decks.length,l:'Mazzi'},{n:decks.reduce((a,d)=>a+d.topics.length,0),l:'Argomenti'},
+    {n:total,l:'Carte totali'},{n:box.length,l:'In scatola'},
+  ].map(x=>`<div style="flex:1;min-width:90px;background:var(--surface2);border-radius:10px;padding:12px 14px"><div style="font-family:'Playfair Display',serif;font-size:1.6rem">${x.n}</div><div style="font-size:0.78rem;color:var(--muted)">${x.l}</div></div>`).join('');
 }
-
-function changeCount(d) { sessionCount=Math.max(1,Math.min(50,sessionCount+d)); document.getElementById('session-count').textContent=sessionCount; }
-
-async function resetBox() {
-  if (!confirm('Rimettere TUTTE le carte nella scatola?')) return;
+function changeCount(d){sessionCount=Math.max(1,Math.min(50,sessionCount+d));document.getElementById('session-count').textContent=sessionCount;}
+async function resetBox(){
+  if(!confirm('Rimettere TUTTE le carte nella scatola?'))return;
   await sb.from('cards').update({in_box:true}).neq('id','00000000-0000-0000-0000-000000000000');
-  await loadAll(); renderHome(); toast('📦 Scatola resettata!');
+  await loadAll();renderHome();toast('📦 Scatola resettata!');
 }
 
-function goTo(page) {
+// ── NAV ───────────────────────────────────────────────────────────────────────
+function goTo(page){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('section-'+page).classList.add('active');
-  document.getElementById('nav-'+page) && document.getElementById('nav-'+page).classList.add('active');
-  if(page==='home') renderHome();
-  else if(page==='mazzi') showMazziView();
-  else if(page==='sfoglia') renderBrowse();
+  const nb=document.getElementById('nav-'+page);if(nb)nb.classList.add('active');
+  if(page==='home')renderHome();
+  else if(page==='mazzi')showDecksView();
+  else if(page==='sfoglia')renderBrowse();
 }
-function goHome() { goTo('home'); }
+function goHome(){goTo('home');}
 
 // ── SESSION ───────────────────────────────────────────────────────────────────
-function startSession() {
-  const box = boxCards();
-  if (!box.length) { toast('La scatola è vuota! Resettala prima.'); return; }
+function startSession(){
+  const box=boxCards();
+  if(!box.length){toast('La scatola è vuota! Resettala prima.');return;}
   shuffle(box);
-  sessionCards = box.slice(0, Math.min(sessionCount, box.length));
-  sessionIdx=0; sessionCorrect=0; sessionWrong=0; sessionKeptOut=[];
+  sessionCards=box.slice(0,Math.min(sessionCount,box.length));
+  sessionIdx=0;sessionCorrect=0;sessionWrong=0;sessionKeptOut=[];
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById('section-session').classList.add('active');
   showSessionCard();
 }
-function startSessionAgain() { goHome(); setTimeout(startSession,100); }
-
-function showSessionCard() {
-  const card = sessionCards[sessionIdx];
-  isFlipped = false;
+function startSessionAgain(){goHome();setTimeout(startSession,100);}
+function showSessionCard(){
+  const card=sessionCards[sessionIdx];
+  isFlipped=false;
   document.getElementById('fc').classList.remove('flipped');
-  // use innerHTML to render rich text
-  document.getElementById('fc-front-text').innerHTML = card.front;
-  document.getElementById('fc-back-text').innerHTML = card.back;
-  document.getElementById('fc-subject-f').textContent = card.deckName ? card.deckName.toUpperCase() : '';
-  document.getElementById('fc-subject-b').textContent = card.deckName ? card.deckName.toUpperCase() : '';
+  document.getElementById('fc-front-text').innerHTML=card.front;
+  document.getElementById('fc-back-text').innerHTML=card.back;
+  document.getElementById('fc-subject-f').textContent=(card.deckName+' › '+card.topicName).toUpperCase();
+  document.getElementById('fc-subject-b').textContent=(card.deckName+' › '+card.topicName).toUpperCase();
   document.getElementById('sess-flip-actions').style.display='flex';
   document.getElementById('sess-rate-actions').style.display='none';
   document.getElementById('after-correct').style.display='none';
@@ -635,25 +597,23 @@ function showSessionCard() {
   document.getElementById('sess-stats-text').textContent=`✓ ${sessionCorrect}  ✗ ${sessionWrong}`;
   document.getElementById('sess-prog-fill').style.width=((sessionIdx/total)*100)+'%';
 }
-
-function handleFCClick() { if(!isFlipped) flipFC(); }
-function flipFC() { isFlipped=true; document.getElementById('fc').classList.add('flipped'); document.getElementById('sess-flip-actions').style.display='none'; document.getElementById('sess-rate-actions').style.display='block'; }
-function rateCorrect() { sessionCorrect++; document.getElementById('rate-btns').style.display='none'; document.getElementById('after-correct').style.display='block'; }
-async function keepOut() {
+function handleFCClick(){if(!isFlipped)flipFC();}
+function flipFC(){isFlipped=true;document.getElementById('fc').classList.add('flipped');document.getElementById('sess-flip-actions').style.display='none';document.getElementById('sess-rate-actions').style.display='block';}
+function rateCorrect(){sessionCorrect++;document.getElementById('rate-btns').style.display='none';document.getElementById('after-correct').style.display='block';}
+async function keepOut(){
   const card=sessionCards[sessionIdx];
   await sb.from('cards').update({in_box:false}).eq('id',card.id);
-  decks.forEach(d=>{const c=d.cards.find(x=>x.id===card.id);if(c)c.in_box=false;});
-  sessionKeptOut.push(card); toast('✓ Carta rimossa dalla scatola'); nextCard();
+  decks.forEach(d=>d.topics.forEach(t=>{const c=t.cards.find(x=>x.id===card.id);if(c)c.in_box=false;}));
+  sessionKeptOut.push(card);toast('✓ Carta rimossa dalla scatola');nextCard();
 }
-function putBack() { toast('↩ Carta rimasta nella scatola'); nextCard(); }
-function rateWrong() { sessionWrong++; toast('✗ Torna nella scatola'); nextCard(); }
-function nextCard() { sessionIdx++; if(sessionIdx>=sessionCards.length) showResults(); else showSessionCard(); }
-function exitSession() { goHome(); }
-
-function showResults() {
+function putBack(){toast('↩ Carta rimasta nella scatola');nextCard();}
+function rateWrong(){sessionWrong++;toast('✗ Torna nella scatola');nextCard();}
+function nextCard(){sessionIdx++;if(sessionIdx>=sessionCards.length)showResults();else showSessionCard();}
+function exitSession(){goHome();}
+function showResults(){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById('section-results').classList.add('active');
-  const total=sessionCards.length, pct=Math.round((sessionCorrect/total)*100);
+  const total=sessionCards.length,pct=Math.round((sessionCorrect/total)*100);
   document.getElementById('res-emoji').textContent=pct>=80?'🎉':pct>=50?'💪':'📖';
   document.getElementById('res-score').textContent=pct+'%';
   document.getElementById('res-sub').textContent=`${sessionCorrect} su ${total} risposte corrette`;
@@ -662,96 +622,219 @@ function showResults() {
   document.getElementById('res-box').textContent=boxCards().length;
   document.getElementById('res-remette-option').style.display=sessionKeptOut.length>0?'block':'none';
 }
-async function remetteTutte() {
-  const ids=sessionKeptOut.map(c=>c.id); if(!ids.length) return;
+async function remetteTutte(){
+  const ids=sessionKeptOut.map(c=>c.id);if(!ids.length)return;
   await sb.from('cards').update({in_box:true}).in('id',ids);
-  decks.forEach(d=>d.cards.forEach(c=>{if(ids.includes(c.id))c.in_box=true;}));
-  sessionKeptOut=[]; document.getElementById('res-box').textContent=boxCards().length;
-  document.getElementById('res-remette-option').style.display='none'; toast('↩ Tutte le carte rimesse nella scatola');
+  decks.forEach(d=>d.topics.forEach(t=>t.cards.forEach(c=>{if(ids.includes(c.id))c.in_box=true;})));
+  sessionKeptOut=[];document.getElementById('res-box').textContent=boxCards().length;
+  document.getElementById('res-remette-option').style.display='none';toast('↩ Tutte rimesse nella scatola');
 }
 
 // ── SFOGLIA ───────────────────────────────────────────────────────────────────
-function renderBrowse() {
-  document.getElementById('browse-filters').innerHTML = [{id:'all',name:'Tutte'},...decks].map(d=>
+function renderBrowse(){
+  // filters: all decks
+  document.getElementById('browse-filters').innerHTML=[{id:'all',name:'Tutte'},...decks].map(d=>
     `<div class="filter-chip ${browseFilter===d.id?'active':''}" onclick="setBrowseFilter('${d.id}')">${d.name}</div>`
   ).join('');
   const list=document.getElementById('browse-list');
-  let cards = browseFilter==='all'
-    ? decks.flatMap(d=>d.cards.map(c=>({...c,deckName:d.name,deckId:d.id})))
-    : (decks.find(d=>d.id===browseFilter)?.cards||[]).map(c=>({...c,deckName:decks.find(d=>d.id===browseFilter).name,deckId:browseFilter}));
+  let cards=browseFilter==='all'?allCards():allCards().filter(c=>c.deckId===browseFilter);
   if(!cards.length){list.innerHTML='<div class="empty"><div class="ei">🔍</div><p>Nessuna carta</p></div>';return;}
   list.innerHTML=cards.map(c=>`
     <div class="ci">
       <div class="ci-content">
-        <div style="font-size:0.72rem;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">${c.deckName}</div>
+        <div style="font-size:0.72rem;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">${c.deckName} › ${c.topicName}</div>
         <div class="ci-front">${c.front}</div>
         <div class="ci-back">${c.back}</div>
         <span class="ci-box">${c.in_box?'📦 In scatola':'✓ Fuori scatola'}</span>
       </div>
       ${role==='admin'?`<div class="ci-actions">
-        <button class="icon-btn edit" title="Modifica" onclick="openEditModal('${c.id}')">✏️</button>
-        ${c.in_box
-          ?`<button class="icon-btn rem-box" onclick="browseToggle('${c.id}',false)">📤</button>`
-          :`<button class="icon-btn add-box" onclick="browseToggle('${c.id}',true)">📥</button>`}
+        <button class="icon-btn" title="Modifica" onclick="openEditModal('${c.id}')">✏️</button>
+        ${c.in_box?`<button class="icon-btn" onclick="toggleCardBox('${c.id}',false)">📤</button>`:`<button class="icon-btn" onclick="toggleCardBox('${c.id}',true)">📥</button>`}
       </div>`:''}
     </div>`).join('');
 }
 function setBrowseFilter(id){browseFilter=id;renderBrowse();}
-async function browseToggle(id,inBox){
+async function toggleCardBox(id,inBox){
   await sb.from('cards').update({in_box:inBox}).eq('id',id);
-  decks.forEach(d=>{const c=d.cards.find(x=>x.id===id);if(c)c.in_box=inBox;});
-  toast(inBox?'📥 Aggiunta alla scatola':'📤 Rimossa dalla scatola'); renderBrowse();
+  decks.forEach(d=>d.topics.forEach(t=>{const c=t.cards.find(x=>x.id===id);if(c)c.in_box=inBox;}));
+  toast(inBox?'📥 Aggiunta alla scatola':'📤 Rimossa dalla scatola');renderBrowse();
 }
 
-// ── MAZZI ─────────────────────────────────────────────────────────────────────
+// ── MAZZI — VIEW DECKS ────────────────────────────────────────────────────────
 function renderColorDots(){
   document.getElementById('cdots').innerHTML=COLORS.map(c=>`<div class="cdot ${c===selectedColor?'sel':''}" style="background:${c}" onclick="selColor('${c}')"></div>`).join('');
 }
 function selColor(c){selectedColor=c;renderColorDots();}
-function renderDeckGrid(){
-  const grid=document.getElementById('deck-grid');
-  if(!decks.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ei">📭</div><p>Nessun mazzo ancora</p></div>';return;}
-  grid.innerHTML=decks.map(d=>{
-    const inBox=d.cards.filter(c=>c.in_box).length;
-    return `<div class="deck-tile" style="--deck-color:${d.color}" onclick="openDeck('${d.id}')">
-      <button class="deck-del" onclick="event.stopPropagation();delDeck('${d.id}')">✕</button>
-      <h3>${d.name}</h3><div class="dc-meta">${d.cards.length} carte</div>
-      <div class="dc-box">${inBox} in scatola</div></div>`;
-  }).join('');
+
+function showDecksView(){
+  currentDeckId=null;currentTopicId=null;
+  document.getElementById('view-decks').style.display='block';
+  document.getElementById('view-topics').style.display='none';
+  document.getElementById('view-topic-detail').style.display='none';
+  document.getElementById('mazzi-subtitle').textContent='Organizza le tue carte';
+  renderDecksView();
 }
+
+function renderDecksView(){
+  const el=document.getElementById('view-decks');
+  const grid=decks.length?decks.map(d=>{
+    const topics=d.topics.length, cards=d.topics.reduce((a,t)=>a+t.cards.length,0);
+    return `<div class="deck-tile" style="--deck-color:${d.color}" onclick="showTopicsView('${d.id}')">
+      <button class="tile-del" onclick="event.stopPropagation();delDeck('${d.id}')">✕</button>
+      <h3>${d.name}</h3>
+      <div class="dc-meta">${topics} argomenti · ${cards} carte</div>
+    </div>`;
+  }).join(''):'<div class="empty" style="grid-column:1/-1"><div class="ei">📭</div><p>Nessun mazzo ancora</p></div>';
+  el.innerHTML=`<div class="deck-grid">${grid}</div>
+  <div class="add-row">
+    <input type="text" id="new-deck-input" placeholder="Nome mazzo (es. Letteratura...)" maxlength="40">
+    <div class="color-dots" id="cdots"></div>
+    <button class="btn btn-primary" onclick="addDeck()">+ Crea</button>
+  </div>`;
+  renderColorDots();
+  document.getElementById('new-deck-input').addEventListener('keydown',e=>{if(e.key==='Enter')addDeck();});
+}
+
 async function addDeck(){
-  const name=document.getElementById('new-deck-input').value.trim(); if(!name)return;
+  const name=document.getElementById('new-deck-input').value.trim();if(!name)return;
   const id=crypto.randomUUID();
-  const {error}=await sb.from('decks').insert({id,name,color:selectedColor});
+  const{error}=await sb.from('decks').insert({id,name,color:selectedColor});
   if(error){toast('Errore: '+error.message);return;}
-  decks.push({id,name,color:selectedColor,cards:[]});
-  document.getElementById('new-deck-input').value='';
-  renderDeckGrid(); toast('📚 Mazzo "'+name+'" creato!');
+  decks.push({id,name,color:selectedColor,topics:[]});
+  renderDecksView();toast('📚 Mazzo "'+name+'" creato!');
 }
 async function delDeck(id){
-  if(!confirm('Eliminare questo mazzo e tutte le sue carte? Questa azione è irreversibile.'))return;
+  if(!confirm('Eliminare questo mazzo, tutti i suoi argomenti e tutte le carte?'))return;
   await sb.from('decks').delete().eq('id',id);
-  decks=decks.filter(d=>d.id!==id); renderDeckGrid();
+  decks=decks.filter(d=>d.id!==id);renderDecksView();
 }
-function showMazziView(){
-  document.getElementById('mazzi-view').style.display='block';
-  document.getElementById('editor-view').style.display='none';
-  currentDeckId=null; renderDeckGrid(); renderColorDots();
+
+// ── MAZZI — VIEW TOPICS ───────────────────────────────────────────────────────
+function showTopicsView(deckId){
+  currentDeckId=deckId;currentTopicId=null;
+  const deck=decks.find(d=>d.id===deckId);
+  document.getElementById('mazzi-subtitle').textContent=deck.name;
+  document.getElementById('view-decks').style.display='none';
+  document.getElementById('view-topics').style.display='block';
+  document.getElementById('view-topic-detail').style.display='none';
+  renderTopicsView();
 }
-function openDeck(id){
-  currentDeckId=id;
-  const deck=decks.find(d=>d.id===id);
-  document.getElementById('ed-title').textContent=deck.name;
-  document.getElementById('mazzi-view').style.display='none';
-  document.getElementById('editor-view').style.display='block';
-  renderCardsList();
-}
-function renderCardsList(){
+
+function renderTopicsView(){
   const deck=decks.find(d=>d.id===currentDeckId);
-  document.getElementById('ed-count').textContent=deck.cards.length+' carte';
-  const list=document.getElementById('cards-list');
-  if(!deck.cards.length){list.innerHTML='<div class="empty"><div class="ei">✏️</div><p>Nessuna carta ancora</p></div>';return;}
-  list.innerHTML=deck.cards.map(c=>`
+  const el=document.getElementById('view-topics');
+  const grid=deck.topics.length?deck.topics.map(t=>`
+    <div class="topic-tile" onclick="showTopicDetail('${t.id}')">
+      <button class="tile-del" onclick="event.stopPropagation();delTopic('${t.id}')">✕</button>
+      <h3>📁 ${t.name}</h3>
+      <div class="topic-meta">
+        <span>🃏 ${t.cards.length} carte</span>
+        <span>📄 ${t.pdfs.length} PDF</span>
+      </div>
+    </div>`).join(''):'<div class="empty" style="grid-column:1/-1"><div class="ei">📁</div><p>Nessun argomento ancora</p></div>';
+  el.innerHTML=`
+    <div class="breadcrumb">
+      <span class="bc-item" onclick="showDecksView()">Mazzi</span>
+      <span class="bc-sep">›</span>
+      <span class="bc-item current">${deck.name}</span>
+    </div>
+    <div class="topic-grid">${grid}</div>
+    <div class="add-row">
+      <input type="text" id="new-topic-input" placeholder="Nome argomento (es. Giacomo da Lentini...)" maxlength="60">
+      <button class="btn btn-primary" onclick="addTopic()">+ Crea</button>
+    </div>`;
+  document.getElementById('new-topic-input').addEventListener('keydown',e=>{if(e.key==='Enter')addTopic();});
+}
+
+async function addTopic(){
+  const name=document.getElementById('new-topic-input').value.trim();if(!name)return;
+  const id=crypto.randomUUID();
+  const{error}=await sb.from('topics').insert({id,deck_id:currentDeckId,name});
+  if(error){toast('Errore: '+error.message);return;}
+  const deck=decks.find(d=>d.id===currentDeckId);
+  deck.topics.push({id,name,deck_id:currentDeckId,cards:[],pdfs:[]});
+  renderTopicsView();toast('📁 Argomento "'+name+'" creato!');
+}
+async function delTopic(id){
+  if(!confirm('Eliminare questo argomento, le sue carte e i suoi PDF?'))return;
+  await sb.from('topics').delete().eq('id',id);
+  decks.forEach(d=>{d.topics=d.topics.filter(t=>t.id!==id);});
+  renderTopicsView();
+}
+
+// ── MAZZI — TOPIC DETAIL ──────────────────────────────────────────────────────
+function showTopicDetail(topicId){
+  currentTopicId=topicId;
+  activeTopicTab='cards';
+  const deck=decks.find(d=>d.id===currentDeckId);
+  const topic=deck.topics.find(t=>t.id===topicId);
+  document.getElementById('mazzi-subtitle').textContent=deck.name+' › '+topic.name;
+  document.getElementById('view-decks').style.display='none';
+  document.getElementById('view-topics').style.display='none';
+  document.getElementById('view-topic-detail').style.display='block';
+  renderTopicDetail();
+}
+
+function renderTopicDetail(){
+  const deck=decks.find(d=>d.id===currentDeckId);
+  const topic=deck.topics.find(t=>t.id===currentTopicId);
+  const el=document.getElementById('view-topic-detail');
+
+  el.innerHTML=`
+    <div class="breadcrumb">
+      <span class="bc-item" onclick="showDecksView()">Mazzi</span>
+      <span class="bc-sep">›</span>
+      <span class="bc-item" onclick="showTopicsView('${deck.id}')">${deck.name}</span>
+      <span class="bc-sep">›</span>
+      <span class="bc-item current">${topic.name}</span>
+    </div>
+    <div class="topic-tabs">
+      <button class="topic-tab ${activeTopicTab==='cards'?'active':''}" onclick="switchTopicTab('cards')">🃏 Flashcard (${topic.cards.length})</button>
+      <button class="topic-tab ${activeTopicTab==='pdfs'?'active':''}" onclick="switchTopicTab('pdfs')">📄 PDF (${topic.pdfs.length})</button>
+    </div>
+    <div id="topic-tab-content"></div>`;
+
+  renderTopicTabContent();
+}
+
+function switchTopicTab(tab){activeTopicTab=tab;renderTopicDetail();}
+
+function renderTopicTabContent(){
+  const deck=decks.find(d=>d.id===currentDeckId);
+  const topic=deck.topics.find(t=>t.id===currentTopicId);
+  const el=document.getElementById('topic-tab-content');
+
+  if(activeTopicTab==='cards'){
+    const tbFId='tb-front-'+currentTopicId, tbBId='tb-back-'+currentTopicId;
+    const cfId='cf-front-'+currentTopicId, cbId='cf-back-'+currentTopicId;
+    el.innerHTML=`
+      <div class="card-form">
+        <div class="section-label">Aggiungi carta</div>
+        <div class="form-grid">
+          <div class="fg"><label>Fronte — domanda</label><div class="rte-wrap"><div class="rte-toolbar" id="${tbFId}"></div><div class="rte-editor" id="${cfId}" data-placeholder="Es. Chi è ${topic.name}?" contenteditable="true"></div></div></div>
+          <div class="fg"><label>Retro — risposta</label><div class="rte-wrap"><div class="rte-toolbar" id="${tbBId}"></div><div class="rte-editor" id="${cbId}" data-placeholder="Risposta..." contenteditable="true"></div></div></div>
+        </div>
+        <div class="form-footer"><button class="btn btn-primary" onclick="addCard('${currentTopicId}','${cfId}','${cbId}')">+ Aggiungi carta</button></div>
+      </div>
+      <div class="cards-list" id="cards-list-${currentTopicId}"></div>`;
+    buildToolbar(tbFId,cfId);
+    buildToolbar(tbBId,cbId);
+    renderCardsList(currentTopicId);
+  } else {
+    el.innerHTML=`
+      <div class="pdf-list" id="pdf-list-${currentTopicId}"></div>
+      <button class="btn btn-primary btn-full" onclick="openPdfModal('${currentTopicId}')">+ Aggiungi PDF</button>`;
+    renderPdfList(currentTopicId);
+  }
+}
+
+function renderCardsList(topicId){
+  const deck=decks.find(d=>d.id===currentDeckId);
+  const topic=deck.topics.find(t=>t.id===topicId);
+  const el=document.getElementById('cards-list-'+topicId);
+  if(!el)return;
+  if(!topic.cards.length){el.innerHTML='<div class="empty"><div class="ei">✏️</div><p>Nessuna carta ancora</p></div>';return;}
+  el.innerHTML=topic.cards.map(c=>`
     <div class="ci">
       <div class="ci-content">
         <div class="ci-front">${c.front}</div>
@@ -759,88 +842,158 @@ function renderCardsList(){
         <span class="ci-box">${c.in_box?'📦 In scatola':'✓ Fuori scatola'}</span>
       </div>
       <div class="ci-actions">
-        <button class="icon-btn edit" title="Modifica" onclick="openEditModal('${c.id}')">✏️</button>
-        ${c.in_box
-          ?`<button class="icon-btn rem-box" onclick="toggleBox('${c.id}',false)">📤</button>`
-          :`<button class="icon-btn add-box" onclick="toggleBox('${c.id}',true)">📥</button>`}
-        <button class="icon-btn del" onclick="delCard('${c.id}')">🗑</button>
+        <button class="icon-btn" onclick="openEditModal('${c.id}')">✏️</button>
+        ${c.in_box?`<button class="icon-btn" onclick="toggleCardBox2('${c.id}',false,'${topicId}')">📤</button>`:`<button class="icon-btn" onclick="toggleCardBox2('${c.id}',true,'${topicId}')">📥</button>`}
+        <button class="icon-btn del" onclick="delCard('${c.id}','${topicId}')">🗑</button>
       </div>
     </div>`).join('');
 }
-async function addCard(){
-  if(isRTEEmpty('cf-front')||isRTEEmpty('cf-back')){toast('Scrivi sia domanda che risposta!');return;}
-  const front=getRTEHtml('cf-front'), back=getRTEHtml('cf-back');
+
+async function addCard(topicId,frontId,backId){
+  if(isRTEEmpty(frontId)||isRTEEmpty(backId)){toast('Scrivi sia domanda che risposta!');return;}
+  const front=getRTE(frontId),back=getRTE(backId);
   const id=crypto.randomUUID();
-  const {error}=await sb.from('cards').insert({id,deck_id:currentDeckId,front,back,in_box:true});
+  const{error}=await sb.from('cards').insert({id,topic_id:topicId,deck_id:currentDeckId,front,back,in_box:true});
   if(error){toast('Errore: '+error.message);return;}
   const deck=decks.find(d=>d.id===currentDeckId);
-  deck.cards.push({id,front,back,in_box:true});
-  clearRTE('cf-front'); clearRTE('cf-back');
-  renderCardsList(); toast('✓ Carta aggiunta!');
+  const topic=deck.topics.find(t=>t.id===topicId);
+  topic.cards.push({id,front,back,in_box:true});
+  clearRTE(frontId);clearRTE(backId);
+  renderCardsList(topicId);renderTopicDetail();toast('✓ Carta aggiunta!');
 }
-async function delCard(id){
-  if(!confirm('Eliminare questa carta? Questa azione è irreversibile.'))return;
+
+async function delCard(id,topicId){
+  if(!confirm('Eliminare questa carta? Azione irreversibile.'))return;
   await sb.from('cards').delete().eq('id',id);
-  decks.forEach(d=>{d.cards=d.cards.filter(c=>c.id!==id);}); renderCardsList();
+  decks.forEach(d=>d.topics.forEach(t=>{t.cards=t.cards.filter(c=>c.id!==id);}));
+  renderCardsList(topicId);renderTopicDetail();
 }
-async function toggleBox(id,inBox){
+
+async function toggleCardBox2(id,inBox,topicId){
   await sb.from('cards').update({in_box:inBox}).eq('id',id);
-  decks.forEach(d=>{const c=d.cards.find(x=>x.id===id);if(c)c.in_box=inBox;});
-  toast(inBox?'📥 Aggiunta alla scatola':'📤 Rimossa dalla scatola'); renderCardsList();
+  decks.forEach(d=>d.topics.forEach(t=>{const c=t.cards.find(x=>x.id===id);if(c)c.in_box=inBox;}));
+  toast(inBox?'📥 Aggiunta alla scatola':'📤 Rimossa dalla scatola');
+  renderCardsList(topicId);
+}
+
+// ── PDF ───────────────────────────────────────────────────────────────────────
+function renderPdfList(topicId){
+  const deck=decks.find(d=>d.id===currentDeckId);
+  const topic=deck.topics.find(t=>t.id===topicId);
+  const el=document.getElementById('pdf-list-'+topicId);
+  if(!el)return;
+  if(!topic.pdfs.length){el.innerHTML='<div class="empty"><div class="ei">📄</div><p>Nessun PDF ancora</p></div>';return;}
+  el.innerHTML=topic.pdfs.map(p=>`
+    <div class="pdf-item">
+      <div class="pdf-icon">📄</div>
+      <div class="pdf-info">
+        <div class="pdf-name">${p.name}</div>
+        <div class="pdf-url">${p.url}</div>
+      </div>
+      <div class="pdf-actions">
+        <a href="${convertDriveUrl(p.url)}" target="_blank" class="btn btn-secondary btn-sm">Apri</a>
+        <button class="icon-btn del" onclick="delPdf('${p.id}','${topicId}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function convertDriveUrl(url){
+  // Convert Google Drive share link to direct view link
+  const m=url.match(/\/file\/d\/([^/]+)/);
+  if(m)return `https://drive.google.com/file/d/${m[1]}/preview`;
+  return url;
+}
+
+function openPdfModal(topicId){
+  addingPdfTopicId=topicId;
+  document.getElementById('pdf-name-input').value='';
+  document.getElementById('pdf-url-input').value='';
+  document.getElementById('pdf-modal').style.display='flex';
+}
+
+async function savePdf(){
+  const name=document.getElementById('pdf-name-input').value.trim();
+  const url=document.getElementById('pdf-url-input').value.trim();
+  if(!name||!url){toast('Inserisci nome e link!');return;}
+  const id=crypto.randomUUID();
+  const{error}=await sb.from('pdfs').insert({id,topic_id:addingPdfTopicId,name,url});
+  if(error){toast('Errore: '+error.message);return;}
+  const deck=decks.find(d=>d.id===currentDeckId);
+  const topic=deck.topics.find(t=>t.id===addingPdfTopicId);
+  topic.pdfs.push({id,name,url});
+  closeModalDirect('pdf-modal');
+  renderPdfList(addingPdfTopicId);renderTopicDetail();
+  toast('📄 PDF aggiunto!');
+}
+
+async function delPdf(id,topicId){
+  if(!confirm('Eliminare questo PDF?'))return;
+  await sb.from('pdfs').delete().eq('id',id);
+  decks.forEach(d=>d.topics.forEach(t=>{t.pdfs=t.pdfs.filter(p=>p.id!==id);}));
+  renderPdfList(topicId);renderTopicDetail();
 }
 
 // ── EDIT MODAL ────────────────────────────────────────────────────────────────
-function openEditModal(id) {
-  let card = null;
-  decks.forEach(d=>{const c=d.cards.find(x=>x.id===id);if(c)card=c;});
+function openEditModal(id){
+  let card=null;
+  decks.forEach(d=>d.topics.forEach(t=>{const c=t.cards.find(x=>x.id===id);if(c)card=c;}));
   if(!card)return;
   editingCardId=id;
-  setRTEHtml('edit-front', card.front);
-  setRTEHtml('edit-back', card.back);
+  setRTE('edit-front',card.front);
+  setRTE('edit-back',card.back);
   document.getElementById('edit-modal').style.display='flex';
 }
-function closeModal(e){ if(e.target===document.getElementById('edit-modal')) closeModalDirect(); }
-function closeModalDirect(){ document.getElementById('edit-modal').style.display='none'; editingCardId=null; }
+function closeModal(id,e){if(e.target===document.getElementById(id))closeModalDirect(id);}
+function closeModalDirect(id){document.getElementById(id).style.display='none';if(id==='edit-modal')editingCardId=null;if(id==='pdf-modal')addingPdfTopicId=null;}
 async function saveEdit(){
   if(!editingCardId)return;
-  const front=getRTEHtml('edit-front'), back=getRTEHtml('edit-back');
+  const front=getRTE('edit-front'),back=getRTE('edit-back');
   if(!front.trim()||!back.trim()){toast('Entrambi i campi sono obbligatori!');return;}
   await sb.from('cards').update({front,back}).eq('id',editingCardId);
-  decks.forEach(d=>{const c=d.cards.find(x=>x.id===editingCardId);if(c){c.front=front;c.back=back;}});
-  closeModalDirect();
-  // re-render whichever view is active
-  if(document.getElementById('section-mazzi').classList.contains('active')&&currentDeckId) renderCardsList();
-  if(document.getElementById('section-sfoglia').classList.contains('active')) renderBrowse();
+  decks.forEach(d=>d.topics.forEach(t=>{const c=t.cards.find(x=>x.id===editingCardId);if(c){c.front=front;c.back=back;}}));
+  closeModalDirect('edit-modal');
+  if(currentTopicId)renderCardsList(currentTopicId);
+  if(document.getElementById('section-sfoglia').classList.contains('active'))renderBrowse();
   toast('✓ Carta aggiornata!');
 }
 
 // ── BACKUP ────────────────────────────────────────────────────────────────────
 function exportData(){
-  const data={exported:new Date().toISOString(),decks:decks.map(d=>({name:d.name,color:d.color,cards:d.cards.map(c=>({front:c.front,back:c.back,in_box:c.in_box}))}))};
+  const data={exported:new Date().toISOString(),decks:decks.map(d=>({
+    name:d.name,color:d.color,
+    topics:d.topics.map(t=>({
+      name:t.name,
+      cards:t.cards.map(c=>({front:c.front,back:c.back,in_box:c.in_box})),
+      pdfs:t.pdfs.map(p=>({name:p.name,url:p.url}))
+    }))
+  }))};
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
   a.download='flashcard-backup-'+new Date().toISOString().slice(0,10)+'.json';
-  a.click(); toast('📤 Backup scaricato!');
+  a.click();toast('📤 Backup scaricato!');
 }
 async function importData(e){
-  const file=e.target.files[0]; if(!file)return;
-  let data; try{data=JSON.parse(await file.text());}catch{toast('File non valido!');return;}
+  const file=e.target.files[0];if(!file)return;
+  let data;try{data=JSON.parse(await file.text());}catch{toast('File non valido!');return;}
   if(!data.decks){toast('Formato non riconosciuto!');return;}
   if(!confirm(`Importare ${data.decks.length} mazzi?`))return;
   for(const d of data.decks){
     const deckId=crypto.randomUUID();
     await sb.from('decks').insert({id:deckId,name:d.name,color:d.color||'#c84b2f'});
-    for(const c of d.cards) await sb.from('cards').insert({id:crypto.randomUUID(),deck_id:deckId,front:c.front,back:c.back,in_box:c.in_box!==false});
+    for(const t of(d.topics||[])){
+      const topicId=crypto.randomUUID();
+      await sb.from('topics').insert({id:topicId,deck_id:deckId,name:t.name});
+      for(const c of(t.cards||[]))await sb.from('cards').insert({id:crypto.randomUUID(),topic_id:topicId,deck_id:deckId,front:c.front,back:c.back,in_box:c.in_box!==false});
+      for(const p of(t.pdfs||[]))await sb.from('pdfs').insert({id:crypto.randomUUID(),topic_id:topicId,name:p.name,url:p.url});
+    }
   }
-  await loadAll(); renderHome(); toast('📥 Importazione completata!'); e.target.value='';
+  await loadAll();renderHome();toast('📥 Importazione completata!');e.target.value='';
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}}
 let toastTimer;
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2400);}
-
-document.getElementById('new-deck-input').addEventListener('keydown',e=>{if(e.key==='Enter')addDeck();});
 </script>
 </body>
 </html>
