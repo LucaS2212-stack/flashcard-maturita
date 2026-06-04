@@ -15,75 +15,103 @@
   --muted: #8a7f72;
   --border: #ddd5c8;
   --accent: #c84b2f;
-  --accent2: #2f6bc8;
   --green: #2a7a4b;
   --radius: 14px;
   --shadow: 0 2px 20px rgba(0,0,0,0.08);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: 'Outfit', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+body { background: var(--bg); color: var(--ink); font-family: 'Outfit', sans-serif; min-height: 100vh; }
 body::before {
-  content: '';
-  position: fixed; inset: 0;
+  content: ''; position: fixed; inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8b89a' fill-opacity='0.12'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   pointer-events: none; z-index: 0;
 }
-.app { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; padding: 0 0 100px; }
+
+/* LOGIN SCREEN */
+.login-screen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.login-box {
+  background: var(--surface); border: 2px solid var(--ink);
+  border-radius: 24px; padding: 36px 28px;
+  width: 100%; max-width: 380px;
+  box-shadow: 6px 6px 0 var(--ink);
+  text-align: center;
+}
+.login-box h1 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 6px; }
+.login-box p { color: var(--muted); font-size: 0.88rem; margin-bottom: 28px; }
+.login-input {
+  width: 100%; background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 13px 16px; font-family: 'Outfit', sans-serif;
+  font-size: 1rem; color: var(--ink); outline: none; transition: border-color 0.2s;
+  text-align: center; letter-spacing: 0.1em; margin-bottom: 12px;
+}
+.login-input:focus { border-color: var(--ink); }
+.login-input::placeholder { letter-spacing: 0; color: var(--muted); }
+.login-btn {
+  width: 100%; padding: 13px; background: var(--ink); color: var(--bg);
+  border: none; border-radius: 10px; font-family: 'Outfit', sans-serif;
+  font-weight: 600; font-size: 1rem; cursor: pointer; transition: opacity 0.2s;
+  margin-bottom: 8px;
+}
+.login-btn:active { opacity: 0.8; }
+.login-error { color: var(--accent); font-size: 0.85rem; margin-top: 8px; min-height: 20px; }
+.login-roles { display: flex; gap: 8px; margin-bottom: 20px; }
+.role-chip {
+  flex: 1; padding: 8px; border-radius: 10px; border: 1.5px solid var(--border);
+  background: var(--surface2); font-size: 0.82rem; font-weight: 500; color: var(--muted);
+  cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.role-chip.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
 /* LOADER */
 .loader {
   position: fixed; inset: 0; background: var(--bg);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  z-index: 9999; gap: 16px;
+  z-index: 9998; gap: 16px;
 }
-.loader-spinner {
-  width: 40px; height: 40px; border: 3px solid var(--border);
-  border-top-color: var(--ink); border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
+.loader-spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--ink); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loader p { color: var(--muted); font-size: 0.9rem; }
 
-/* NAV */
+/* APP */
+.app { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; padding: 0 0 100px; display: none; }
+
 nav {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(245,240,232,0.95);
-  backdrop-filter: blur(12px);
+  background: rgba(245,240,232,0.95); backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
-  padding: 12px 16px;
-  display: flex; gap: 6px;
+  padding: 12px 16px; display: flex; gap: 6px;
 }
 .nav-btn {
-  flex: 1; padding: 10px 8px;
-  background: transparent; border: none;
+  flex: 1; padding: 10px 8px; background: transparent; border: none;
   font-family: 'Outfit', sans-serif; font-size: 0.82rem; font-weight: 500;
   color: var(--muted); border-radius: 10px; cursor: pointer;
   transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 3px;
 }
 .nav-btn .nav-icon { font-size: 1.2rem; }
 .nav-btn.active { background: var(--ink); color: var(--bg); }
+.admin-badge {
+  position: fixed; bottom: 16px; right: 16px; z-index: 200;
+  background: var(--accent); color: white; padding: 8px 14px;
+  border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+  box-shadow: 0 4px 12px rgba(200,75,47,0.3);
+}
 
 .page-header { padding: 28px 20px 20px; }
 .page-header h1 { font-family: 'Playfair Display', serif; font-size: 1.9rem; }
 .page-header p { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
-
 .section { display: none; padding: 0 16px; }
 .section.active { display: block; }
-
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
 
 /* BOX */
 .box-visual {
   background: var(--surface); border: 2px solid var(--ink);
   border-radius: 20px; padding: 24px 20px; margin-bottom: 20px;
-  position: relative; overflow: hidden;
-  box-shadow: 4px 4px 0 var(--ink);
+  position: relative; overflow: hidden; box-shadow: 4px 4px 0 var(--ink);
 }
 .box-visual::before {
   content: ''; position: absolute; bottom: 0; left: 0; right: 0;
@@ -115,19 +143,17 @@ nav {
 .btn-full { width: 100%; }
 .btn-sm { padding: 7px 12px; font-size: 0.82rem; }
 
-/* COUNT SELECTOR */
 .count-row { display: flex; align-items: center; gap: 12px; background: var(--surface2); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; }
 .count-row label { flex: 1; font-weight: 500; font-size: 0.95rem; }
 .count-ctrl { display: flex; align-items: center; gap: 10px; }
 .count-num { font-family: 'Playfair Display', serif; font-size: 1.5rem; min-width: 36px; text-align: center; }
-.count-btn { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 600; transition: all 0.15s; }
+.count-btn { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
 .count-btn:active { transform: scale(0.9); }
 
 /* FLASHCARD */
 .fc-wrap { perspective: 1400px; margin: 0 auto 24px; max-width: 560px; }
 .fc {
-  width: 100%; aspect-ratio: 3/2;
-  position: relative; transform-style: preserve-3d;
+  width: 100%; aspect-ratio: 3/2; position: relative; transform-style: preserve-3d;
   transition: transform 0.55s cubic-bezier(0.4,0,0.2,1);
   cursor: pointer; border-radius: 22px;
   filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12));
@@ -149,12 +175,10 @@ nav {
 .fc-hint { margin-top: 18px; font-size: 0.78rem; color: var(--muted); }
 .fc-back .fc-hint { color: rgba(255,255,255,0.3); }
 
-/* PROGRESS */
 .session-progress { margin-bottom: 20px; }
 .progress-info { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--muted); margin-bottom: 8px; }
 .progress-bar { height: 5px; background: var(--border); border-radius: 10px; overflow: hidden; }
 .progress-fill { height: 100%; background: var(--ink); border-radius: 10px; transition: width 0.4s ease; }
-
 .session-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .session-actions .btn { flex: 1; min-width: 120px; padding: 13px; }
 
@@ -168,7 +192,6 @@ nav {
 .after-correct .btn-row { display: flex; gap: 8px; }
 .after-correct .btn-row .btn { flex: 1; }
 
-/* RESULTS */
 .results { text-align: center; padding: 32px 16px; animation: fadeUp 0.4s ease; }
 @keyframes fadeUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform: translateY(0); } }
 .results-emoji { font-size: 3.5rem; margin-bottom: 12px; }
@@ -184,7 +207,7 @@ nav {
 .results-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 .results-actions .btn { min-width: 140px; }
 
-/* MAZZI */
+/* ADMIN - MAZZI */
 .deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
 .deck-tile {
   background: var(--surface); border: 2px solid var(--border);
@@ -196,7 +219,7 @@ nav {
 .deck-tile h3 { font-family: 'Playfair Display', serif; font-size: 1.05rem; margin-bottom: 4px; }
 .deck-tile .dc-meta { font-size: 0.8rem; color: var(--muted); }
 .deck-tile .dc-box { font-size: 0.78rem; margin-top: 6px; color: var(--accent); font-weight: 500; }
-.deck-del { position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 0.85rem; padding: 4px; border-radius: 6px; transition: color 0.15s; }
+.deck-del { position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 0.85rem; padding: 4px; border-radius: 6px; }
 .deck-del:hover { color: var(--accent); }
 
 .add-deck {
@@ -204,9 +227,8 @@ nav {
   border-radius: var(--radius); padding: 18px;
   display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 8px;
 }
-.add-deck input {
-  flex: 1; min-width: 150px;
-  background: var(--surface); border: 1px solid var(--border);
+.add-deck input, .login-input {
+  flex: 1; min-width: 150px; background: var(--surface); border: 1px solid var(--border);
   border-radius: 10px; padding: 10px 14px;
   font-family: 'Outfit', sans-serif; font-size: 0.95rem; color: var(--ink);
   outline: none; transition: border-color 0.2s;
@@ -217,7 +239,6 @@ nav {
 .cdot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
 .cdot.sel { border-color: var(--ink); transform: scale(1.2); }
 
-/* EDITOR */
 .editor-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
 .editor-header h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; flex: 1; }
 .editor-count { font-size: 0.82rem; color: var(--muted); }
@@ -259,9 +280,16 @@ textarea::placeholder { color: var(--muted); }
 .filter-chip { padding: 7px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 500; border: 1.5px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; transition: all 0.15s; }
 .filter-chip.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
+/* BACKUP */
+.backup-section { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.backup-btn { padding: 16px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--surface); display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all 0.15s; }
+.backup-btn:hover { border-color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+.backup-icon { font-size: 1.8rem; }
+.backup-info h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 3px; }
+.backup-info p { font-size: 0.82rem; color: var(--muted); }
+
 .empty { text-align: center; padding: 48px 20px; color: var(--muted); }
 .empty .ei { font-size: 2.5rem; margin-bottom: 10px; }
-
 .toast {
   position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
   background: var(--ink); color: var(--bg); padding: 10px 20px;
@@ -274,17 +302,39 @@ textarea::placeholder { color: var(--muted); }
 </head>
 <body>
 
-<div class="loader" id="loader">
+<!-- LOGIN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div style="font-size:2.5rem;margin-bottom:8px">📦</div>
+    <h1>Flashcard Studio</h1>
+    <p>Inserisci il tuo codice per accedere</p>
+    <div class="login-roles">
+      <div class="role-chip active" id="chip-student" onclick="selectRole('student')">👤 Studente</div>
+      <div class="role-chip" id="chip-admin" onclick="selectRole('admin')">🔑 Admin</div>
+    </div>
+    <input class="login-input" type="password" id="login-input" placeholder="Inserisci codice..." autocomplete="off">
+    <button class="login-btn" onclick="tryLogin()">Accedi →</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- LOADER -->
+<div class="loader" id="loader" style="display:none">
   <div class="loader-spinner"></div>
   <p>Caricamento...</p>
 </div>
 
-<div class="app" id="app" style="display:none">
-  <nav>
+<!-- APP -->
+<div class="app" id="app">
+  <nav id="main-nav">
     <button class="nav-btn active" onclick="goTo('home')" id="nav-home"><span class="nav-icon">📦</span>Scatola</button>
-    <button class="nav-btn" onclick="goTo('mazzi')" id="nav-mazzi"><span class="nav-icon">📚</span>Mazzi</button>
     <button class="nav-btn" onclick="goTo('sfoglia')" id="nav-sfoglia"><span class="nav-icon">🔍</span>Sfoglia</button>
+    <button class="nav-btn admin-only" onclick="goTo('mazzi')" id="nav-mazzi" style="display:none"><span class="nav-icon">📚</span>Mazzi</button>
+    <button class="nav-btn admin-only" onclick="goTo('backup')" id="nav-backup" style="display:none"><span class="nav-icon">💾</span>Backup</button>
+    <button class="nav-btn" onclick="logout()" id="nav-logout"><span class="nav-icon">🚪</span>Esci</button>
   </nav>
+
+  <div id="admin-badge" style="display:none" class="admin-badge">🔑 Admin</div>
 
   <!-- HOME -->
   <div class="section active" id="section-home">
@@ -296,7 +346,7 @@ textarea::placeholder { color: var(--muted); }
       </div>
       <div class="box-actions">
         <button class="btn btn-primary" onclick="startSession()">🎲 Inizia sessione</button>
-        <button class="btn btn-secondary btn-sm" onclick="resetBox()">↺ Reset scatola</button>
+        <button class="btn btn-secondary btn-sm admin-only" id="btn-reset-box" onclick="resetBox()" style="display:none">↺ Reset</button>
       </div>
     </div>
     <div class="card" style="margin-bottom:16px">
@@ -387,9 +437,16 @@ textarea::placeholder { color: var(--muted); }
     </div>
   </div>
 
-  <!-- MAZZI -->
+  <!-- SFOGLIA -->
+  <div class="section" id="section-sfoglia">
+    <div class="page-header"><h1>Sfoglia</h1><p>Tutte le carte, filtra per materia</p></div>
+    <div class="browse-filters" id="browse-filters"></div>
+    <div class="cards-list" id="browse-list"></div>
+  </div>
+
+  <!-- MAZZI (admin only) -->
   <div class="section" id="section-mazzi">
-    <div class="page-header"><h1>Mazzi</h1><p>Organizza le tue carte per materia</p></div>
+    <div class="page-header"><h1>Mazzi</h1><p>Gestisci le carte per materia</p></div>
     <div id="mazzi-view">
       <div class="deck-grid" id="deck-grid"></div>
       <div class="add-deck">
@@ -416,11 +473,45 @@ textarea::placeholder { color: var(--muted); }
     </div>
   </div>
 
-  <!-- SFOGLIA -->
-  <div class="section" id="section-sfoglia">
-    <div class="page-header"><h1>Sfoglia</h1><p>Tutte le carte, filtra per materia</p></div>
-    <div class="browse-filters" id="browse-filters"></div>
-    <div class="cards-list" id="browse-list"></div>
+  <!-- BACKUP (admin only) -->
+  <div class="section" id="section-backup">
+    <div class="page-header"><h1>Backup</h1><p>Esporta e importa le tue flashcard</p></div>
+    <div class="backup-section">
+      <div class="backup-btn" onclick="exportData()">
+        <div class="backup-icon">📤</div>
+        <div class="backup-info">
+          <h3>Esporta tutto (JSON)</h3>
+          <p>Scarica tutte le carte e i mazzi come file di backup</p>
+        </div>
+      </div>
+      <div class="backup-btn" onclick="document.getElementById('import-file').click()">
+        <div class="backup-icon">📥</div>
+        <div class="backup-info">
+          <h3>Importa da JSON</h3>
+          <p>Ripristina le carte da un file di backup precedente</p>
+        </div>
+      </div>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+    <div class="card">
+      <div class="section-label">Cambia codici di accesso</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+        <div>
+          <label style="font-size:0.82rem;color:var(--muted);display:block;margin-bottom:6px">Nuovo codice studente</label>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="new-student-code" placeholder="Nuovo codice studente" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-family:'Outfit',sans-serif;font-size:0.95rem;color:var(--ink);outline:none">
+            <button class="btn btn-secondary" onclick="updateCode('student')">Salva</button>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:0.82rem;color:var(--muted);display:block;margin-bottom:6px">Nuova password admin</label>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="new-admin-code" placeholder="Nuova password admin" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-family:'Outfit',sans-serif;font-size:0.95rem;color:var(--ink);outline:none">
+            <button class="btn btn-secondary" onclick="updateCode('admin')">Salva</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -431,14 +522,97 @@ const SUPABASE_URL = 'https://vurjcwhvakfrdtylfkol.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1cmpjd2h2YWtmcmR0eWxma29sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NzcyMjQsImV4cCI6MjA5NjE1MzIyNH0.iWe90C5HjwXlh6YPY9RscqDKxBgl17Xl7hd0PjMykeQ';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// DEFAULT CODES — cambiabili dal pannello backup
+let CODES = { student: 'STUDIA2025', admin: 'ADMIN2025' };
 const COLORS = ['#c84b2f','#2f6bc8','#2a7a4b','#b85ad4','#d4882a','#2ab8b8'];
-let decks = []; // [{id, name, color, cards:[{id,front,back,in_box}]}]
+
+let role = null; // 'student' | 'admin'
+let decks = [];
 let sessionCount = 5;
 let selectedColor = COLORS[0];
 let sessionCards = [], sessionIdx = 0, sessionCorrect = 0, sessionWrong = 0, sessionKeptOut = [];
 let isFlipped = false;
 let currentDeckId = null;
 let browseFilter = 'all';
+let selectedRole = 'student';
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+function selectRole(r) {
+  selectedRole = r;
+  document.getElementById('chip-student').classList.toggle('active', r === 'student');
+  document.getElementById('chip-admin').classList.toggle('active', r === 'admin');
+  document.getElementById('login-input').placeholder = r === 'admin' ? 'Password admin...' : 'Codice studente...';
+}
+
+async function tryLogin() {
+  const code = document.getElementById('login-input').value.trim();
+  const err = document.getElementById('login-error');
+
+  // Load codes from Supabase settings if available
+  await loadCodes();
+
+  if (selectedRole === 'admin' && code === CODES.admin) {
+    role = 'admin';
+  } else if (selectedRole === 'student' && code === CODES.student) {
+    role = 'student';
+  } else {
+    err.textContent = 'Codice non corretto. Riprova.';
+    document.getElementById('login-input').value = '';
+    return;
+  }
+
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('loader').style.display = 'flex';
+  await loadAll();
+  document.getElementById('loader').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  applyRole();
+  renderHome();
+  renderColorDots();
+}
+
+document.getElementById('login-input').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
+
+function applyRole() {
+  const isAdmin = role === 'admin';
+  document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? '' : 'none');
+  document.getElementById('admin-badge').style.display = isAdmin ? 'block' : 'none';
+  if (isAdmin) {
+    document.getElementById('nav-mazzi').style.display = '';
+    document.getElementById('nav-backup').style.display = '';
+    document.getElementById('btn-reset-box').style.display = '';
+  }
+}
+
+function logout() {
+  role = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-input').value = '';
+  document.getElementById('login-error').textContent = '';
+  selectRole('student');
+}
+
+// ── CODES ─────────────────────────────────────────────────────────────────────
+async function loadCodes() {
+  try {
+    const { data } = await sb.from('settings').select('*');
+    if (data && data.length) {
+      data.forEach(row => { if(row.key === 'student_code') CODES.student = row.value; if(row.key === 'admin_code') CODES.admin = row.value; });
+    }
+  } catch(e) {}
+}
+
+async function updateCode(type) {
+  const inputId = type === 'student' ? 'new-student-code' : 'new-admin-code';
+  const val = document.getElementById(inputId).value.trim();
+  if (!val || val.length < 4) { toast('Codice troppo corto (min 4 caratteri)'); return; }
+  const key = type === 'student' ? 'student_code' : 'admin_code';
+  await sb.from('settings').upsert({ key, value: val }, { onConflict: 'key' });
+  CODES[type] = val;
+  document.getElementById(inputId).value = '';
+  toast('✓ Codice aggiornato!');
+}
 
 // ── DB ────────────────────────────────────────────────────────────────────────
 async function loadAll() {
@@ -446,31 +620,37 @@ async function loadAll() {
   const { data: cardRows } = await sb.from('cards').select('*').order('created_at');
   decks = (deckRows || []).map(d => ({
     ...d,
-    cards: (cardRows || []).filter(c => c.deck_id === d.id).map(c => ({
-      id: c.id, front: c.front, back: c.back, in_box: c.in_box
-    }))
+    cards: (cardRows || []).filter(c => c.deck_id === d.id).map(c => ({ id: c.id, front: c.front, back: c.back, in_box: c.in_box }))
   }));
 }
 
-function boxCards() {
-  return decks.flatMap(d => d.cards.filter(c => c.in_box).map(c => ({...c, deckId: d.id, deckName: d.name})));
+function boxCards() { return decks.flatMap(d => d.cards.filter(c => c.in_box).map(c => ({...c, deckId: d.id, deckName: d.name}))); }
+function totalCards() { return decks.reduce((a, d) => a + d.cards.length, 0); }
+
+// ── HOME ──────────────────────────────────────────────────────────────────────
+function renderHome() {
+  const box = boxCards(); const total = totalCards();
+  document.getElementById('box-count').textContent = box.length;
+  document.getElementById('box-subtitle').textContent = box.length === 0 ? 'Scatola vuota!' : 'Pronte per il ripasso';
+  const pct = total > 0 ? Math.round((box.length / total) * 100) : 0;
+  document.getElementById('box-visual').style.setProperty('--fill-pct', pct + '%');
+  document.getElementById('session-count').textContent = sessionCount;
+  document.getElementById('home-stats').innerHTML = [
+    { n: decks.length, l: 'Mazzi' }, { n: total, l: 'Carte totali' },
+    { n: box.length, l: 'In scatola' }, { n: total - box.length, l: 'Fuori scatola' },
+  ].map(x => `<div style="flex:1;min-width:100px;background:var(--surface2);border-radius:10px;padding:12px 14px"><div style="font-family:'Playfair Display',serif;font-size:1.6rem">${x.n}</div><div style="font-size:0.78rem;color:var(--muted)">${x.l}</div></div>`).join('');
 }
 
-function totalCards() {
-  return decks.reduce((a, d) => a + d.cards.length, 0);
+function changeCount(d) { sessionCount = Math.max(1, Math.min(50, sessionCount + d)); document.getElementById('session-count').textContent = sessionCount; }
+
+async function resetBox() {
+  if (!confirm('Rimettere TUTTE le carte nella scatola?')) return;
+  await sb.from('cards').update({ in_box: true }).neq('id', '00000000-0000-0000-0000-000000000000');
+  await loadAll(); renderHome();
+  toast('📦 Scatola resettata!');
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
-async function init() {
-  await loadAll();
-  document.getElementById('loader').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  renderHome();
-  renderColorDots();
-  document.getElementById('new-deck-input').addEventListener('keydown', e => { if(e.key==='Enter') addDeck(); });
-}
-
-// ── NAV ───────────────────────────────────────────────────────────────────────
+// ── SESSION ───────────────────────────────────────────────────────────────────
 function goTo(page) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -482,41 +662,6 @@ function goTo(page) {
 }
 function goHome() { goTo('home'); }
 
-// ── HOME ──────────────────────────────────────────────────────────────────────
-function renderHome() {
-  const box = boxCards();
-  const total = totalCards();
-  document.getElementById('box-count').textContent = box.length;
-  document.getElementById('box-subtitle').textContent = box.length === 0 ? 'Scatola vuota — resetta per ricominciare' : 'Pronte per il ripasso';
-  const pct = total > 0 ? Math.round((box.length / total) * 100) : 0;
-  document.getElementById('box-visual').style.setProperty('--fill-pct', pct + '%');
-  document.getElementById('session-count').textContent = sessionCount;
-  document.getElementById('home-stats').innerHTML = [
-    { n: decks.length, l: 'Mazzi' },
-    { n: total, l: 'Carte totali' },
-    { n: box.length, l: 'In scatola' },
-    { n: total - box.length, l: 'Fuori scatola' },
-  ].map(x => `<div style="flex:1;min-width:100px;background:var(--surface2);border-radius:10px;padding:12px 14px"><div style="font-family:'Playfair Display',serif;font-size:1.6rem">${x.n}</div><div style="font-size:0.78rem;color:var(--muted)">${x.l}</div></div>`).join('');
-}
-
-function changeCount(d) {
-  sessionCount = Math.max(1, Math.min(50, sessionCount + d));
-  document.getElementById('session-count').textContent = sessionCount;
-}
-
-async function resetBox() {
-  const total = totalCards();
-  if (total === 0) { toast('Nessuna carta trovata!'); return; }
-  if (!confirm('Rimettere TUTTE le carte nella scatola?')) return;
-  // set all cards in_box = true
-  const { error } = await sb.from('cards').update({ in_box: true }).neq('id', '00000000-0000-0000-0000-000000000000');
-  if (error) { toast('Errore: ' + error.message); return; }
-  await loadAll();
-  renderHome();
-  toast('📦 Scatola resettata con ' + totalCards() + ' carte!');
-}
-
-// ── SESSION ───────────────────────────────────────────────────────────────────
 function startSession() {
   const box = boxCards();
   if (box.length === 0) { toast('La scatola è vuota! Resettala prima.'); return; }
@@ -555,33 +700,22 @@ function flipFC() {
   document.getElementById('sess-flip-actions').style.display = 'none';
   document.getElementById('sess-rate-actions').style.display = 'block';
 }
-
 function rateCorrect() {
   sessionCorrect++;
   document.getElementById('rate-btns').style.display = 'none';
   document.getElementById('after-correct').style.display = 'block';
 }
-
 async function keepOut() {
   const card = sessionCards[sessionIdx];
   await sb.from('cards').update({ in_box: false }).eq('id', card.id);
-  // update local
   decks.forEach(d => { const c = d.cards.find(x => x.id === card.id); if(c) c.in_box = false; });
   sessionKeptOut.push(card);
   toast('✓ Carta rimossa dalla scatola');
   nextCard();
 }
-
 function putBack() { toast('↩ Carta rimasta nella scatola'); nextCard(); }
-
 function rateWrong() { sessionWrong++; toast('✗ Torna nella scatola'); nextCard(); }
-
-function nextCard() {
-  sessionIdx++;
-  if (sessionIdx >= sessionCards.length) showResults();
-  else showSessionCard();
-}
-
+function nextCard() { sessionIdx++; if (sessionIdx >= sessionCards.length) showResults(); else showSessionCard(); }
 function exitSession() { goHome(); }
 
 function showResults() {
@@ -600,7 +734,7 @@ function showResults() {
 
 async function remetteTutte() {
   const ids = sessionKeptOut.map(c => c.id);
-  if (ids.length === 0) return;
+  if (!ids.length) return;
   await sb.from('cards').update({ in_box: true }).in('id', ids);
   decks.forEach(d => d.cards.forEach(c => { if(ids.includes(c.id)) c.in_box = true; }));
   sessionKeptOut = [];
@@ -609,7 +743,41 @@ async function remetteTutte() {
   toast('↩ Tutte le carte rimesse nella scatola');
 }
 
-// ── MAZZI ─────────────────────────────────────────────────────────────────────
+// ── SFOGLIA ───────────────────────────────────────────────────────────────────
+function renderBrowse() {
+  const filters = document.getElementById('browse-filters');
+  filters.innerHTML = [{ id: 'all', name: 'Tutte' }, ...decks].map(d =>
+    `<div class="filter-chip ${browseFilter===d.id?'active':''}" onclick="setBrowseFilter('${d.id}')">${d.name}</div>`
+  ).join('');
+  const list = document.getElementById('browse-list');
+  let cards = browseFilter === 'all'
+    ? decks.flatMap(d => d.cards.map(c => ({...c, deckName: d.name, deckId: d.id})))
+    : (decks.find(d => d.id === browseFilter)?.cards || []).map(c => ({...c, deckName: decks.find(d=>d.id===browseFilter).name, deckId: browseFilter}));
+  if (!cards.length) { list.innerHTML = '<div class="empty"><div class="ei">🔍</div><p>Nessuna carta</p></div>'; return; }
+  list.innerHTML = cards.map(c => `
+    <div class="ci">
+      <div class="ci-content">
+        <div style="font-size:0.72rem;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">${c.deckName}</div>
+        <div class="ci-front">${c.front}</div>
+        <div class="ci-back">${c.back}</div>
+        <span class="ci-box">${c.in_box ? '📦 In scatola' : '✓ Fuori scatola'}</span>
+      </div>
+      ${role === 'admin' ? `<div class="ci-actions">
+        ${c.in_box
+          ? `<button class="icon-btn rem-box" onclick="browseToggle('${c.id}',false)">📤</button>`
+          : `<button class="icon-btn add-box" onclick="browseToggle('${c.id}',true)">📥</button>`}
+      </div>` : ''}
+    </div>`).join('');
+}
+function setBrowseFilter(id) { browseFilter = id; renderBrowse(); }
+async function browseToggle(id, inBox) {
+  await sb.from('cards').update({ in_box: inBox }).eq('id', id);
+  decks.forEach(d => { const c = d.cards.find(x => x.id === id); if(c) c.in_box = inBox; });
+  toast(inBox ? '📥 Aggiunta alla scatola' : '📤 Rimossa dalla scatola');
+  renderBrowse();
+}
+
+// ── MAZZI (admin) ─────────────────────────────────────────────────────────────
 function renderColorDots() {
   document.getElementById('cdots').innerHTML = COLORS.map(c =>
     `<div class="cdot ${c===selectedColor?'sel':''}" style="background:${c}" onclick="selColor('${c}')"></div>`
@@ -639,12 +807,11 @@ async function addDeck() {
   if (error) { toast('Errore: ' + error.message); return; }
   decks.push({ id, name, color: selectedColor, cards: [] });
   document.getElementById('new-deck-input').value = '';
-  renderDeckGrid();
-  toast('📚 Mazzo "' + name + '" creato!');
+  renderDeckGrid(); toast('📚 Mazzo "' + name + '" creato!');
 }
 
 async function delDeck(id) {
-  if (!confirm('Eliminare questo mazzo e tutte le sue carte?')) return;
+  if (!confirm('Eliminare questo mazzo?')) return;
   await sb.from('decks').delete().eq('id', id);
   decks = decks.filter(d => d.id !== id);
   renderDeckGrid();
@@ -653,9 +820,7 @@ async function delDeck(id) {
 function showMazziView() {
   document.getElementById('mazzi-view').style.display = 'block';
   document.getElementById('editor-view').style.display = 'none';
-  currentDeckId = null;
-  renderDeckGrid();
-  renderColorDots();
+  currentDeckId = null; renderDeckGrid(); renderColorDots();
 }
 
 function openDeck(id) {
@@ -672,7 +837,7 @@ function renderCardsList() {
   document.getElementById('ed-count').textContent = deck.cards.length + ' carte';
   const list = document.getElementById('cards-list');
   if (!deck.cards.length) { list.innerHTML = '<div class="empty"><div class="ei">✏️</div><p>Nessuna carta ancora</p></div>'; return; }
-  list.innerHTML = deck.cards.map((c, i) => `
+  list.innerHTML = deck.cards.map(c => `
     <div class="ci">
       <div class="ci-content">
         <div class="ci-front">${c.front}</div>
@@ -681,8 +846,8 @@ function renderCardsList() {
       </div>
       <div class="ci-actions">
         ${c.in_box
-          ? `<button class="icon-btn rem-box" title="Rimuovi dalla scatola" onclick="toggleBox('${c.id}',false)">📤</button>`
-          : `<button class="icon-btn add-box" title="Aggiungi alla scatola" onclick="toggleBox('${c.id}',true)">📥</button>`}
+          ? `<button class="icon-btn rem-box" onclick="toggleBox('${c.id}',false)">📤</button>`
+          : `<button class="icon-btn add-box" onclick="toggleBox('${c.id}',true)">📥</button>`}
         <button class="icon-btn del" onclick="delCard('${c.id}')">🗑</button>
       </div>
     </div>`).join('');
@@ -699,8 +864,7 @@ async function addCard() {
   deck.cards.push({ id, front, back, in_box: true });
   document.getElementById('cf-front').value = '';
   document.getElementById('cf-back').value = '';
-  renderCardsList();
-  toast('✓ Carta aggiunta e messa in scatola');
+  renderCardsList(); toast('✓ Carta aggiunta!');
 }
 
 async function delCard(id) {
@@ -716,59 +880,43 @@ async function toggleBox(id, inBox) {
   renderCardsList();
 }
 
-// ── SFOGLIA ───────────────────────────────────────────────────────────────────
-function renderBrowse() {
-  const filters = document.getElementById('browse-filters');
-  filters.innerHTML = [{ id: 'all', name: 'Tutte' }, ...decks].map(d =>
-    `<div class="filter-chip ${browseFilter===d.id?'active':''}" onclick="setBrowseFilter('${d.id}')">${d.name}</div>`
-  ).join('');
-  const list = document.getElementById('browse-list');
-  let cards = browseFilter === 'all'
-    ? decks.flatMap(d => d.cards.map(c => ({...c, deckName: d.name})))
-    : (decks.find(d => d.id === browseFilter)?.cards || []).map(c => ({...c, deckName: decks.find(d=>d.id===browseFilter).name}));
-  if (!cards.length) { list.innerHTML = '<div class="empty"><div class="ei">🔍</div><p>Nessuna carta</p></div>'; return; }
-  list.innerHTML = cards.map(c => `
-    <div class="ci">
-      <div class="ci-content">
-        <div style="font-size:0.72rem;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">${c.deckName}</div>
-        <div class="ci-front">${c.front}</div>
-        <div class="ci-back">${c.back}</div>
-        <span class="ci-box">${c.in_box ? '📦 In scatola' : '✓ Fuori scatola'}</span>
-      </div>
-      <div class="ci-actions">
-        ${c.in_box
-          ? `<button class="icon-btn rem-box" onclick="browseToggle('${c.id}',false)">📤</button>`
-          : `<button class="icon-btn add-box" onclick="browseToggle('${c.id}',true)">📥</button>`}
-      </div>
-    </div>`).join('');
+// ── BACKUP ────────────────────────────────────────────────────────────────────
+function exportData() {
+  const data = { exported: new Date().toISOString(), decks: decks.map(d => ({ name: d.name, color: d.color, cards: d.cards.map(c => ({ front: c.front, back: c.back, in_box: c.in_box })) })) };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'flashcard-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  toast('📤 Backup scaricato!');
 }
 
-function setBrowseFilter(id) { browseFilter = id; renderBrowse(); }
-
-async function browseToggle(id, inBox) {
-  await sb.from('cards').update({ in_box: inBox }).eq('id', id);
-  decks.forEach(d => { const c = d.cards.find(x => x.id === id); if(c) c.in_box = inBox; });
-  toast(inBox ? '📥 Aggiunta alla scatola' : '📤 Rimossa dalla scatola');
-  renderBrowse();
+async function importData(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const text = await file.text();
+  let data;
+  try { data = JSON.parse(text); } catch { toast('File non valido!'); return; }
+  if (!data.decks) { toast('Formato non riconosciuto!'); return; }
+  if (!confirm(`Importare ${data.decks.length} mazzi? Le carte esistenti non verranno toccate.`)) return;
+  for (const d of data.decks) {
+    const deckId = crypto.randomUUID();
+    await sb.from('decks').insert({ id: deckId, name: d.name, color: d.color || '#c84b2f' });
+    for (const c of d.cards) {
+      await sb.from('cards').insert({ id: crypto.randomUUID(), deck_id: deckId, front: c.front, back: c.back, in_box: c.in_box !== false });
+    }
+  }
+  await loadAll(); renderHome();
+  toast('📥 Importazione completata!');
+  e.target.value = '';
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i+1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-}
+function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i+1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } }
 let toastTimer;
 function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+  const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
 }
-
-init();
 </script>
 </body>
 </html>
