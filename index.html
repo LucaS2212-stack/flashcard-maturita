@@ -89,7 +89,7 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .fc-wrap { perspective: 1400px; margin: 0 auto 24px; max-width: 560px; }
 .fc { width: 100%; aspect-ratio: 3/2; position: relative; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); cursor: pointer; border-radius: 22px; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); }
 .fc.flipped { transform: rotateY(180deg); }
-.fc-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px; text-align: center; overflow: hidden; }
+.fc-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px; text-align: center; overflow: hidden; }
 .fc-front { background: var(--surface); border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); }
 .fc-back { background: var(--ink); transform: rotateY(180deg); }
 .fc-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; color: var(--muted); font-weight: 600; flex-shrink: 0; }
@@ -277,6 +277,10 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
       <div class="fg"><label>Fronte</label><div class="rte-wrap"><div class="rte-toolbar" id="edit-tb-front"></div><div class="rte-editor" id="edit-front" data-placeholder="Fronte..." contenteditable="true"></div></div></div>
       <div class="fg"><label>Retro</label><div class="rte-wrap"><div class="rte-toolbar" id="edit-tb-back"></div><div class="rte-editor" id="edit-back" data-placeholder="Retro..." contenteditable="true"></div></div></div>
     </div>
+    <div class="fg" style="margin-top:12px">
+      <label style="display:block;font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;font-weight:500">Sposta in argomento</label>
+      <select id="edit-topic-select" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-family:'Outfit',sans-serif;font-size:0.95rem;color:var(--ink);outline:none"></select>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModalDirect('edit-modal')">Annulla</button>
       <button class="btn btn-primary" onclick="saveEdit()">💾 Salva</button>
@@ -453,6 +457,7 @@ let sessionCards = [], sessionIdx = 0, sessionCorrect = 0, sessionWrong = 0, ses
 let isFlipped = false, browseFilter = 'all', selectedRole = 'student';
 let currentDeckId = null, currentTopicId = null;
 let editingCardId = null, addingPdfTopicId = null;
+let browseTopicFilter = 'all-topics';
 let activeTopicTab = 'cards';
 
 // ── RTE ───────────────────────────────────────────────────────────────────────
@@ -632,12 +637,24 @@ async function remetteTutte(){
 
 // ── SFOGLIA ───────────────────────────────────────────────────────────────────
 function renderBrowse(){
-  // filters: all decks
-  document.getElementById('browse-filters').innerHTML=[{id:'all',name:'Tutte'},...decks].map(d=>
+  const deckChips=[{id:'all',name:'Tutte'},...decks].map(d=>
     `<div class="filter-chip ${browseFilter===d.id?'active':''}" onclick="setBrowseFilter('${d.id}')">${d.name}</div>`
   ).join('');
+  let topicChips='';
+  if(browseFilter!=='all'){
+    const deck=decks.find(d=>d.id===browseFilter);
+    if(deck&&deck.topics.length){
+      topicChips='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">'+
+        [{id:'all-topics',name:'Tutti'},...deck.topics].map(t=>
+          `<div class="filter-chip ${browseTopicFilter===t.id?'active':''}" onclick="setBrowseTopicFilter('${t.id}')" style="font-size:0.78rem">${t.name}</div>`
+        ).join('')+'</div>';
+    }
+  }
+  document.getElementById('browse-filters').innerHTML=deckChips+topicChips;
   const list=document.getElementById('browse-list');
-  let cards=browseFilter==='all'?allCards():allCards().filter(c=>c.deckId===browseFilter);
+  let cards=allCards();
+  if(browseFilter!=='all') cards=cards.filter(c=>c.deckId===browseFilter);
+  if(browseTopicFilter!=='all-topics') cards=cards.filter(c=>c.topicId===browseTopicFilter);
   if(!cards.length){list.innerHTML='<div class="empty"><div class="ei">🔍</div><p>Nessuna carta</p></div>';return;}
   list.innerHTML=cards.map(c=>`
     <div class="ci">
@@ -653,7 +670,8 @@ function renderBrowse(){
       </div>`:''}
     </div>`).join('');
 }
-function setBrowseFilter(id){browseFilter=id;renderBrowse();}
+function setBrowseFilter(id){browseFilter=id;browseTopicFilter='all-topics';renderBrowse();}
+function setBrowseTopicFilter(id){browseTopicFilter=id;renderBrowse();}
 async function toggleCardBox(id,inBox){
   await sb.from('cards').update({in_box:inBox}).eq('id',id);
   decks.forEach(d=>d.topics.forEach(t=>{const c=t.cards.find(x=>x.id===id);if(c)c.in_box=inBox;}));
@@ -935,12 +953,16 @@ async function delPdf(id,topicId){
 
 // ── EDIT MODAL ────────────────────────────────────────────────────────────────
 function openEditModal(id){
-  let card=null;
-  decks.forEach(d=>d.topics.forEach(t=>{const c=t.cards.find(x=>x.id===id);if(c)card=c;}));
+  let card=null, cardTopicId=null, cardDeckId=null;
+  decks.forEach(d=>d.topics.forEach(t=>{const c=t.cards.find(x=>x.id===id);if(c){card=c;cardTopicId=t.id;cardDeckId=d.id;}}));
   if(!card)return;
   editingCardId=id;
   setRTE('edit-front',card.front);
   setRTE('edit-back',card.back);
+  // Build topic selector
+  const allTopics=decks.flatMap(d=>d.topics.map(t=>({...t,deckName:d.name,deckId:d.id})));
+  const sel=document.getElementById('edit-topic-select');
+  sel.innerHTML=allTopics.map(t=>`<option value="${t.id}" ${t.id===cardTopicId?'selected':''}>${t.deckName} › ${t.name}</option>`).join('');
   document.getElementById('edit-modal').style.display='flex';
 }
 function closeModal(id,e){if(e.target===document.getElementById(id))closeModalDirect(id);}
@@ -949,8 +971,15 @@ async function saveEdit(){
   if(!editingCardId)return;
   const front=getRTE('edit-front'),back=getRTE('edit-back');
   if(!front.trim()||!back.trim()){toast('Entrambi i campi sono obbligatori!');return;}
-  await sb.from('cards').update({front,back}).eq('id',editingCardId);
-  decks.forEach(d=>d.topics.forEach(t=>{const c=t.cards.find(x=>x.id===editingCardId);if(c){c.front=front;c.back=back;}}));
+  const newTopicId=document.getElementById('edit-topic-select').value;
+  // find deck of new topic
+  let newDeckId=null;
+  decks.forEach(d=>d.topics.forEach(t=>{if(t.id===newTopicId)newDeckId=d.id;}));
+  await sb.from('cards').update({front,back,topic_id:newTopicId,deck_id:newDeckId}).eq('id',editingCardId);
+  // update local state: remove from old topic, add to new
+  let movedCard=null;
+  decks.forEach(d=>d.topics.forEach(t=>{const idx=t.cards.findIndex(x=>x.id===editingCardId);if(idx>=0){movedCard={...t.cards[idx],front,back};t.cards.splice(idx,1);}}));
+  if(movedCard){decks.forEach(d=>d.topics.forEach(t=>{if(t.id===newTopicId)t.cards.push(movedCard);}));}
   closeModalDirect('edit-modal');
   if(currentTopicId)renderCardsList(currentTopicId);
   if(document.getElementById('section-sfoglia').classList.contains('active'))renderBrowse();
