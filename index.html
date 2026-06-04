@@ -56,6 +56,17 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
 .section-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 600; margin-bottom: 12px; }
 
+/* MODE CARDS */
+.mode-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 0; }
+.mode-card:hover { border-color: var(--ink); }
+.mode-card.open { border-color: var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+.mode-card-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; }
+.mode-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 3px; }
+.mode-desc { font-size: 0.8rem; color: var(--muted); }
+.mode-chevron { font-size: 0.8rem; color: var(--muted); transition: transform 0.2s; }
+.mode-card.open .mode-chevron { transform: rotate(90deg); }
+.mode-body { padding: 0 18px 16px; border-top: 1px solid var(--border); padding-top: 14px; }
+
 /* BOX */
 .box-visual { background: var(--surface); border: 2px solid var(--ink); border-radius: 20px; padding: 24px 20px; margin-bottom: 20px; position: relative; overflow: hidden; box-shadow: 4px 4px 0 var(--ink); }
 .box-visual::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: var(--fill-pct, 0%); background: linear-gradient(to top, #f0e6d0, #f8f2e8); transition: height 0.8s cubic-bezier(0.34,1.56,0.64,1); }
@@ -327,15 +338,59 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
         <div style="text-align:right"><div class="box-count" id="box-count">0</div><div class="box-label">carte</div></div>
       </div>
       <div class="box-actions">
-        <button class="btn btn-primary" onclick="startSession()">🎲 Inizia sessione</button>
         <button class="btn btn-secondary btn-sm" id="btn-reset-box" onclick="resetBox()" style="display:none">↺ Reset</button>
       </div>
     </div>
-    <div class="card" style="margin-bottom:16px">
-      <div class="section-label">Quante carte per sessione?</div>
-      <div class="count-row"><label>Carte da estrarre</label><div class="count-ctrl"><button class="count-btn" onclick="changeCount(-1)">−</button><div class="count-num" id="session-count">5</div><button class="count-btn" onclick="changeCount(1)">+</button></div></div>
-      <div style="font-size:0.82rem;color:var(--muted)">Estratte a caso dalla scatola.</div>
+
+    <!-- MODALITÀ -->
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+      <!-- Modalità 1: Classica -->
+      <div class="mode-card" onclick="toggleMode('classic')">
+        <div class="mode-card-header">
+          <div>
+            <div class="mode-title">🎲 Sessione classica</div>
+            <div class="mode-desc">Carte casuali dalla scatola</div>
+          </div>
+          <div class="mode-chevron" id="chev-classic">▶</div>
+        </div>
+        <div class="mode-body" id="body-classic" style="display:none">
+          <div class="count-row" style="margin-bottom:8px"><label>Carte da estrarre</label><div class="count-ctrl"><button class="count-btn" onclick="event.stopPropagation();changeCount(-1)">−</button><div class="count-num" id="session-count">5</div><button class="count-btn" onclick="event.stopPropagation();changeCount(1)">+</button></div></div>
+          <button class="btn btn-primary btn-full" onclick="event.stopPropagation();startSession()">Inizia →</button>
+        </div>
+      </div>
+
+      <!-- Modalità 2: Personalizzata -->
+      <div class="mode-card" onclick="toggleMode('custom')">
+        <div class="mode-card-header">
+          <div>
+            <div class="mode-title">🎯 Sessione personalizzata</div>
+            <div class="mode-desc">Scegli quante carte per ogni materia</div>
+          </div>
+          <div class="mode-chevron" id="chev-custom">▶</div>
+        </div>
+        <div class="mode-body" id="body-custom" style="display:none">
+          <div id="custom-deck-rows" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
+          <button class="btn btn-primary btn-full" onclick="event.stopPropagation();startCustomSession()">Inizia →</button>
+        </div>
+      </div>
+
+      <!-- Modalità 3: Simulazione maturità -->
+      <div class="mode-card" onclick="toggleMode('maturita')">
+        <div class="mode-card-header">
+          <div>
+            <div class="mode-title">🎓 Simulazione maturità</div>
+            <div class="mode-desc">X domande per ogni materia</div>
+          </div>
+          <div class="mode-chevron" id="chev-maturita">▶</div>
+        </div>
+        <div class="mode-body" id="body-maturita" style="display:none">
+          <div class="count-row" style="margin-bottom:8px"><label>Domande per materia</label><div class="count-ctrl"><button class="count-btn" onclick="event.stopPropagation();changeMaturitaCount(-1)">−</button><div class="count-num" id="maturita-count">2</div><button class="count-btn" onclick="event.stopPropagation();changeMaturitaCount(1)">+</button></div></div>
+          <div style="font-size:0.82rem;color:var(--muted);margin-bottom:12px">Verranno estratte <span id="maturita-preview">—</span> carte totali</div>
+          <button class="btn btn-accent btn-full" onclick="event.stopPropagation();startMaturitaSession()">🎓 Inizia simulazione →</button>
+        </div>
+      </div>
     </div>
+
     <div class="card"><div class="section-label">Riepilogo</div><div id="home-stats" style="display:flex;gap:12px;flex-wrap:wrap;"></div></div>
   </div>
 
@@ -556,6 +611,100 @@ function renderHome(){
   ].map(x=>`<div style="flex:1;min-width:90px;background:var(--surface2);border-radius:10px;padding:12px 14px"><div style="font-family:'Playfair Display',serif;font-size:1.6rem">${x.n}</div><div style="font-size:0.78rem;color:var(--muted)">${x.l}</div></div>`).join('');
 }
 function changeCount(d){sessionCount=Math.max(1,Math.min(50,sessionCount+d));document.getElementById('session-count').textContent=sessionCount;}
+
+let maturitaCount=2;
+function changeMaturitaCount(d){
+  maturitaCount=Math.max(1,Math.min(20,maturitaCount+d));
+  document.getElementById('maturita-count').textContent=maturitaCount;
+  updateMaturitaPreview();
+}
+function updateMaturitaPreview(){
+  const total=decks.reduce((a,d)=>a+Math.min(maturitaCount,d.topics.reduce((b,t)=>b+t.cards.filter(c=>c.in_box).length,0)),0);
+  const el=document.getElementById('maturita-preview');
+  if(el) el.textContent=total+' ('+decks.length+' materie × '+maturitaCount+')';
+}
+
+function toggleMode(mode){
+  const modes=['classic','custom','maturita'];
+  modes.forEach(m=>{
+    const body=document.getElementById('body-'+m);
+    const chev=document.getElementById('chev-'+m);
+    const card=body.closest('.mode-card');
+    if(m===mode){
+      const isOpen=body.style.display!=='none';
+      body.style.display=isOpen?'none':'block';
+      card.classList.toggle('open',!isOpen);
+      if(!isOpen&&m==='custom') renderCustomDeckRows();
+      if(!isOpen&&m==='maturita') updateMaturitaPreview();
+    } else {
+      body.style.display='none';
+      card.classList.remove('open');
+    }
+  });
+}
+
+let customCounts={};
+function renderCustomDeckRows(){
+  const el=document.getElementById('custom-deck-rows');
+  if(!el)return;
+  el.innerHTML=decks.map(d=>{
+    const boxCount=d.topics.reduce((a,t)=>a+t.cards.filter(c=>c.in_box).length,0);
+    const val=customCounts[d.id]!==undefined?customCounts[d.id]:Math.min(3,boxCount);
+    customCounts[d.id]=val;
+    return `<div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border-radius:10px;padding:10px 14px">
+      <div style="flex:1">
+        <div style="font-weight:500;font-size:0.88rem">${d.name}</div>
+        <div style="font-size:0.75rem;color:var(--muted)">${boxCount} in scatola</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="count-btn" onclick="event.stopPropagation();changeCustomCount('${d.id}',-1)">−</button>
+        <div id="cc-${d.id}" style="font-family:'Playfair Display',serif;font-size:1.3rem;min-width:28px;text-align:center">${val}</div>
+        <button class="count-btn" onclick="event.stopPropagation();changeCustomCount('${d.id}',1,${boxCount})">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function changeCustomCount(deckId,d,max){
+  const boxCount=max||decks.find(dk=>dk.id===deckId).topics.reduce((a,t)=>a+t.cards.filter(c=>c.in_box).length,0);
+  customCounts[deckId]=Math.max(0,Math.min(boxCount,( customCounts[deckId]||0)+d));
+  const el=document.getElementById('cc-'+deckId);
+  if(el)el.textContent=customCounts[deckId];
+}
+
+function startCustomSession(){
+  let cards=[];
+  decks.forEach(d=>{
+    const n=customCounts[d.id]||0;
+    if(n===0)return;
+    const boxCards=d.topics.flatMap(t=>t.cards.filter(c=>c.in_box).map(c=>({...c,deckId:d.id,deckName:d.name,topicId:t.id,topicName:t.name})));
+    shuffle(boxCards);
+    cards.push(...boxCards.slice(0,n));
+  });
+  if(!cards.length){toast('Nessuna carta selezionata!');return;}
+  shuffle(cards);
+  launchSession(cards);
+}
+
+function startMaturitaSession(){
+  let cards=[];
+  decks.forEach(d=>{
+    const boxCards=d.topics.flatMap(t=>t.cards.filter(c=>c.in_box).map(c=>({...c,deckId:d.id,deckName:d.name,topicId:t.id,topicName:t.name})));
+    shuffle(boxCards);
+    cards.push(...boxCards.slice(0,maturitaCount));
+  });
+  if(!cards.length){toast('Nessuna carta in scatola!');return;}
+  // interleave by deck for maturita feel
+  launchSession(cards);
+}
+
+function launchSession(cards){
+  sessionCards=cards;
+  sessionIdx=0;sessionCorrect=0;sessionWrong=0;sessionKeptOut=[];
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('section-session').classList.add('active');
+  showSessionCard();
+}
 async function resetBox(){
   if(!confirm('Rimettere TUTTE le carte nella scatola?'))return;
   await sb.from('cards').update({in_box:true}).neq('id','00000000-0000-0000-0000-000000000000');
@@ -579,11 +728,7 @@ function startSession(){
   const box=boxCards();
   if(!box.length){toast('La scatola è vuota! Resettala prima.');return;}
   shuffle(box);
-  sessionCards=box.slice(0,Math.min(sessionCount,box.length));
-  sessionIdx=0;sessionCorrect=0;sessionWrong=0;sessionKeptOut=[];
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById('section-session').classList.add('active');
-  showSessionCard();
+  launchSession(box.slice(0,Math.min(sessionCount,box.length)));
 }
 function startSessionAgain(){goHome();setTimeout(startSession,100);}
 function showSessionCard(){
