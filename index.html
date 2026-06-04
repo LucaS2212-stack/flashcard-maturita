@@ -86,18 +86,18 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .count-btn { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
 
 /* FLASHCARD */
-.fc-wrap { perspective: 1400px; margin: 0 auto 24px; max-width: 560px; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); }
-.fc { width: 100%; aspect-ratio: 3/2; position: relative; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); cursor: pointer; border-radius: 22px; }
+.fc-wrap { perspective: 1400px; margin: 0 auto 24px; max-width: 680px; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); }
+.fc { width: 100%; aspect-ratio: 16/9; position: relative; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); cursor: pointer; border-radius: 22px; }
 .fc.flipped { transform: rotateY(180deg); }
-.fc-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px; text-align: center; overflow: hidden; transform: rotateY(0deg); }
+.fc-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 22px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; padding: 24px 32px 24px 32px; text-align: left; overflow: hidden; transform: rotateY(0deg); }
 .fc-front { background: var(--surface); border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); }
-.fc-back { background: var(--ink); transform: rotateY(180deg); }
-.fc-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; color: var(--muted); font-weight: 600; flex-shrink: 0; }
-.fc-back .fc-tag { color: rgba(255,255,255,0.4); }
-.fc-subject { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); font-weight: 600; margin-bottom: 6px; flex-shrink: 0; }
-.fc-back .fc-subject { color: #f0b090; }
-.fc-content { font-family: 'Playfair Display', serif; font-size: clamp(0.95rem, 2.5vw, 1.35rem); line-height: 1.5; color: var(--ink); overflow-y: auto; max-height: 160px; width: 100%; text-align: left; }
-.fc-back .fc-content { color: var(--bg); }
+.fc-back { background: #2e2b26; transform: rotateY(180deg); }
+.fc-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 6px; color: var(--muted); font-weight: 600; flex-shrink: 0; }
+.fc-back .fc-tag { color: rgba(255,255,255,0.5); }
+.fc-subject { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); font-weight: 600; margin-bottom: 2px; flex-shrink: 0; }
+.fc-back .fc-subject { color: #e8b090; }
+.fc-content { font-family: 'Playfair Display', serif; font-size: clamp(1rem, 2.8vw, 1.45rem); line-height: 1.6; color: var(--ink); overflow-y: auto; flex: 1; width: 100%; text-align: left; margin-top: 6px; }
+.fc-back .fc-content { color: #f0ece4; }
 .fc-content ul, .fc-content ol { padding-left: 1.4em; }
 .fc-content li { margin-bottom: 2px; }
 .fc-hint { margin-top: 10px; font-size: 0.78rem; color: var(--muted); flex-shrink: 0; }
@@ -358,13 +358,13 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
             <div class="fc-subject" id="fc-subject-f"></div>
             <div class="fc-tag">Domanda</div>
             <div class="fc-content" id="fc-front-text"></div>
-            <div class="fc-hint">Tocca per vedere la risposta</div>
+
           </div>
           <div class="fc-face fc-back">
             <div class="fc-subject" id="fc-subject-b"></div>
             <div class="fc-tag">Risposta</div>
             <div class="fc-content" id="fc-back-text"></div>
-            <div class="fc-hint">Tocca di nuovo per tornare</div>
+
           </div>
         </div>
       </div>
@@ -602,8 +602,9 @@ function showSessionCard(){
   document.getElementById('sess-stats-text').textContent=`✓ ${sessionCorrect}  ✗ ${sessionWrong}`;
   document.getElementById('sess-prog-fill').style.width=((sessionIdx/total)*100)+'%';
 }
-function handleFCClick(){if(!isFlipped)flipFC();}
+function handleFCClick(){if(!isFlipped)flipFC();else unflipFC();}
 function flipFC(){isFlipped=true;document.getElementById('fc').classList.add('flipped');document.getElementById('sess-flip-actions').style.display='none';document.getElementById('sess-rate-actions').style.display='block';}
+function unflipFC(){document.getElementById('fc').classList.remove('flipped');isFlipped=false;}
 function rateCorrect(){sessionCorrect++;document.getElementById('rate-btns').style.display='none';document.getElementById('after-correct').style.display='block';}
 async function keepOut(){
   const card=sessionCards[sessionIdx];
