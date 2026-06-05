@@ -56,6 +56,43 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
 .section-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 600; margin-bottom: 12px; }
 
+/* FLASHCARD STYLES */
+.fc-style-a-front{background:#fff;border:1.5px solid #ddd5c8}
+.fc-style-a-back{background:#f7f5f0;border:1.5px solid #ddd5c8}
+.fc-style-a-text{font-family:'Outfit',sans-serif;font-size:14px;line-height:1.8;color:#444;font-weight:400}
+.fc-style-a-text b,.fc-style-a-text strong{font-weight:700;color:#1a1410}
+
+.fc-style-b-front{background:#fff;border:1.5px solid #ddd5c8}
+.fc-style-b-back{background:#faf8f3;border:1.5px solid #ddd5c8}
+.fc-style-b-accent{position:absolute;top:0;left:0;width:3px;height:100%;background:#E8943A;border-radius:2px 0 0 2px}
+.fc-style-b-text{font-family:'Playfair Display',serif;font-size:14px;line-height:1.8;color:#555;font-weight:400}
+.fc-style-b-text b,.fc-style-b-text strong{font-weight:700;color:#1a1410}
+.fc-style-b-subject{color:#B5640A!important}
+
+.fc-style-c-front{background:#1e1c19;border:1.5px solid #3a3730}
+.fc-style-c-back{background:#252320;border:1.5px solid #3a3730}
+.fc-style-c-text{font-family:'Outfit',sans-serif;font-size:14px;line-height:1.8;color:#aaa;font-weight:400}
+.fc-style-c-text b,.fc-style-c-text strong{font-weight:700;color:#f5f0e8}
+.fc-style-c-subject{color:#c4824a!important}
+.fc-style-c-tag{color:#6b6760!important}
+
+.fc-style-d-front{background:#fff;border:2px solid #1a1410}
+.fc-style-d-back{background:#1a1410;border:2px solid #1a1410}
+.fc-style-d-text{font-family:'Playfair Display',serif;font-size:14px;line-height:1.8;color:#555;font-weight:400}
+.fc-style-d-text b,.fc-style-d-text strong{font-weight:700;color:#1a1410}
+.fc-style-d-text-inv{font-family:'Playfair Display',serif;font-size:14px;line-height:1.8;color:#c8c0b0;font-weight:400}
+.fc-style-d-text-inv b,.fc-style-d-text-inv strong{font-weight:700;color:#fff}
+.fc-style-d-subject-inv{color:rgba(255,255,255,0.4)!important}
+.fc-style-d-tag-inv{color:rgba(255,255,255,0.25)!important}
+
+.style-tile{border:2px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:all .15s;position:relative}
+.style-tile:hover{border-color:var(--ink)}
+.style-tile.selected{border-color:var(--accent);box-shadow:3px 3px 0 var(--accent)}
+.style-tile-name{font-size:0.82rem;font-weight:600;margin-bottom:8px;color:var(--ink)}
+.style-mini{border-radius:8px;padding:10px 12px;min-height:60px;position:relative;overflow:hidden}
+.style-check{position:absolute;top:8px;right:8px;background:var(--accent);color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;display:none}
+.style-tile.selected .style-check{display:flex}
+
 /* MODE CARDS */
 .mode-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 0; }
 .mode-card:hover { border-color: var(--ink); }
@@ -323,6 +360,7 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
   <nav>
     <button class="nav-btn active" onclick="goTo('home')" id="nav-home"><span class="nav-icon">📦</span>Scatola</button>
     <button class="nav-btn" onclick="goTo('sfoglia')" id="nav-sfoglia"><span class="nav-icon">🔍</span>Sfoglia</button>
+    <button class="nav-btn" onclick="goTo('stile')" id="nav-stile"><span class="nav-icon">🎨</span>Stile</button>
     <button class="nav-btn" onclick="goTo('mazzi')" id="nav-mazzi" style="display:none"><span class="nav-icon">📚</span>Mazzi</button>
     <button class="nav-btn" onclick="goTo('backup')" id="nav-backup" style="display:none"><span class="nav-icon">💾</span>Backup</button>
     <button class="nav-btn" onclick="logout()"><span class="nav-icon">🚪</span>Esci</button>
@@ -482,6 +520,16 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
     <div id="view-topic-detail" style="display:none"></div>
   </div>
 
+  <!-- STILE -->
+  <div class="section" id="section-stile">
+    <div class="page-header"><h1>Stile carte</h1><p>Scegli come appaiono le flashcard</p></div>
+    <div id="style-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px"></div>
+    <div class="card">
+      <div class="section-label">Anteprima</div>
+      <div id="style-preview" style="margin-top:8px"></div>
+    </div>
+  </div>
+
   <!-- BACKUP -->
   <div class="section" id="section-backup">
     <div class="page-header"><h1>Backup</h1><p>Esporta, importa e impostazioni</p></div>
@@ -555,7 +603,7 @@ async function tryLogin(){
   await loadAll();
   document.getElementById('loader').style.display='none';
   document.getElementById('app').style.display='block';
-  applyRole(); buildAllToolbars(); renderHome(); renderColorDots();
+  applyRole(); buildAllToolbars(); renderHome(); renderColorDots(); setTimeout(applyCardStyle,100);
 }
 document.getElementById('login-input').addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin();});
 function applyRole(){
@@ -720,6 +768,7 @@ function goTo(page){
   if(page==='home')renderHome();
   else if(page==='mazzi')showDecksView();
   else if(page==='sfoglia')renderBrowse();
+  else if(page==='stile')renderStyleSection();
 }
 function goHome(){goTo('home');}
 
@@ -737,6 +786,7 @@ function showSessionCard(){
   document.getElementById('fc').classList.remove('flipped');
   document.getElementById('fc-front-text').innerHTML=card.front;
   document.getElementById('fc-back-text').innerHTML=card.back;
+  applyCardStyle();
   document.getElementById('fc-subject-f').textContent=(card.deckName+' › '+card.topicName).toUpperCase();
   document.getElementById('fc-subject-b').textContent=(card.deckName+' › '+card.topicName).toUpperCase();
   document.getElementById('sess-flip-actions').style.display='flex';
@@ -955,7 +1005,7 @@ function renderTopicDetail(){
     </div>
     <div class="topic-tabs">
       <button class="topic-tab ${activeTopicTab==='cards'?'active':''}" onclick="switchTopicTab('cards')">🃏 Flashcard (${topic.cards.length})</button>
-      <button class="topic-tab ${activeTopicTab==='pdfs'?'active':''}" onclick="switchTopicTab('pdfs')">📄 PDF (${topic.pdfs.length})</button>
+      ${topic.pdfs.length>0||role==='admin'?`<button class="topic-tab ${activeTopicTab==='pdfs'?'active':''}" onclick="switchTopicTab('pdfs')">📄 PDF (${topic.pdfs.length})</button>`:''}
     </div>
     <div id="topic-tab-content"></div>`;
 
@@ -988,7 +1038,7 @@ function renderTopicTabContent(){
   } else {
     el.innerHTML=`
       <div class="pdf-list" id="pdf-list-${currentTopicId}"></div>
-      <button class="btn btn-primary btn-full" onclick="openPdfModal('${currentTopicId}')">+ Aggiungi PDF</button>`;
+      ${role==='admin'?`<button class="btn btn-primary btn-full" onclick="openPdfModal('${currentTopicId}')">+ Aggiungi PDF</button>`:''}`;
     renderPdfList(currentTopicId);
   }
 }
@@ -1057,7 +1107,7 @@ function renderPdfList(topicId){
       </div>
       <div class="pdf-actions">
         <a href="${convertDriveUrl(p.url)}" target="_blank" class="btn btn-secondary btn-sm">Apri</a>
-        <button class="icon-btn del" onclick="delPdf('${p.id}','${topicId}')">🗑</button>
+        ${role==='admin'?`<button class="icon-btn del" onclick="delPdf('${p.id}','${topicId}')">🗑</button>`:''}
       </div>
     </div>`).join('');
 }
@@ -1164,6 +1214,112 @@ async function importData(e){
     }
   }
   await loadAll();renderHome();toast('📥 Importazione completata!');e.target.value='';
+}
+
+// ── STILE ────────────────────────────────────────────────────────────────────
+const CARD_STYLES = {
+  a: { name:'Moderno', desc:'Sans-serif pulito', frontClass:'fc-style-a-front', backClass:'fc-style-a-back', textClass:'fc-style-a-text', textBackClass:'fc-style-a-text', accent:false },
+  b: { name:'Classico', desc:'Serif caldo con accento', frontClass:'fc-style-b-front', backClass:'fc-style-b-back', textClass:'fc-style-b-text', textBackClass:'fc-style-b-text', accent:true, subjectClass:'fc-style-b-subject' },
+  c: { name:'Scuro', desc:'Elegante su sfondo scuro', frontClass:'fc-style-c-front', backClass:'fc-style-c-back', textClass:'fc-style-c-text', textBackClass:'fc-style-c-text', accent:false, subjectClass:'fc-style-c-subject', tagClass:'fc-style-c-tag' },
+  d: { name:'Netto', desc:'Bianco/nero ad alto contrasto', frontClass:'fc-style-d-front', backClass:'fc-style-d-back', textClass:'fc-style-d-text', textBackClass:'fc-style-d-text-inv', accent:false, invertBack:true }
+};
+
+let currentStyle = localStorage.getItem('fc-style') || 'b';
+
+function applyCardStyle(){
+  const s = CARD_STYLES[currentStyle];
+  const fc = document.getElementById('fc');
+  if(!fc) return;
+  // front face
+  const front = fc.querySelector('.fc-front');
+  const back = fc.querySelector('.fc-back');
+  Object.keys(CARD_STYLES).forEach(k=>{
+    const st=CARD_STYLES[k];
+    front.classList.remove(st.frontClass);
+    back.classList.remove(st.backClass);
+  });
+  front.classList.add(s.frontClass);
+  back.classList.add(s.backClass);
+  // text
+  const frontText = document.getElementById('fc-front-text');
+  const backText = document.getElementById('fc-back-text');
+  const subjectF = document.getElementById('fc-subject-f');
+  const subjectB = document.getElementById('fc-subject-b');
+  const tagF = document.getElementById('fc-tag-f');
+  const tagB = document.getElementById('fc-tag-b');
+  if(frontText){
+    frontText.className='fc-content '+s.textClass;
+    backText.className='fc-content '+s.textBackClass;
+  }
+  if(subjectF){
+    subjectF.className='fc-subject'+(s.subjectClass?' '+s.subjectClass:'');
+    subjectB.className='fc-subject'+(s.subjectClass?' '+s.subjectClass:'');
+  }
+  if(tagF){
+    tagF.className='fc-tag'+(s.tagClass?' '+s.tagClass:'');
+    tagB.className='fc-tag'+(s.tagClass?' '+s.tagClass:'');
+  }
+  // accent
+  let accEl = front.querySelector('.fc-style-b-accent');
+  if(s.accent && !accEl){
+    const a=document.createElement('div');a.className='fc-style-b-accent';
+    front.insertBefore(a,front.firstChild);
+    const a2=document.createElement('div');a2.className='fc-style-b-accent';
+    back.insertBefore(a2,back.firstChild);
+  } else if(!s.accent){
+    front.querySelectorAll('.fc-style-b-accent').forEach(e=>e.remove());
+    back.querySelectorAll('.fc-style-b-accent').forEach(e=>e.remove());
+  }
+}
+
+function renderStyleSection(){
+  const grid = document.getElementById('style-grid');
+  if(!grid) return;
+  grid.innerHTML = Object.entries(CARD_STYLES).map(([key,s])=>`
+    <div class="style-tile ${currentStyle===key?'selected':''}" onclick="selectStyle('${key}')">
+      <div class="style-check">✓</div>
+      <div class="style-tile-name">${s.name}</div>
+      <div class="style-mini ${s.frontClass}" style="font-size:12px;line-height:1.5;color:${key==='c'?'#aaa':'#555'}">
+        ${s.accent?'<div class="fc-style-b-accent"></div>':''}
+        <div style="padding-left:${s.accent?'10px':'0'};font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:${key==='c'?'#c4824a':'#B5640A'};margin-bottom:3px">Letteratura › Montale</div>
+        <span class="${s.textClass}" style="font-size:12px">1925 pubblica <b>Ossi di Seppia</b></span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">${s.desc}</div>
+    </div>`).join('');
+  renderStylePreview();
+}
+
+function renderStylePreview(){
+  const s = CARD_STYLES[currentStyle];
+  const preview = document.getElementById('style-preview');
+  if(!preview) return;
+  preview.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="fc-face ${s.frontClass}" style="position:relative;border-radius:16px;padding:20px 24px;min-height:140px;overflow:hidden">
+        ${s.accent?'<div class="fc-style-b-accent"></div>':''}
+        <div style="padding-left:${s.accent?'10px':'0'}">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;${s.subjectClass?'color:#B5640A':'color:#8a7f72'};margin-bottom:3px">Letteratura › Montale</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#aaa;margin-bottom:8px">Domanda</div>
+          <div class="${s.textClass}" style="font-size:13px">La vita di Montale</div>
+        </div>
+      </div>
+      <div class="fc-face ${s.backClass}" style="position:relative;border-radius:16px;padding:20px 24px;min-height:140px;overflow:hidden">
+        ${s.accent?'<div class="fc-style-b-accent"></div>':''}
+        <div style="padding-left:${s.accent?'10px':'0'}">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;${s.subjectClass?'color:#B5640A':(s.invertBack?'color:rgba(255,255,255,0.4)':'color:#8a7f72')};margin-bottom:3px">Letteratura › Montale</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;${s.invertBack?'color:rgba(255,255,255,0.25)':(s.tagClass?'color:#6b6760':'color:#aaa')};margin-bottom:8px">Risposta</div>
+          <div class="${s.textBackClass}" style="font-size:12px"><ul style="padding-left:1.2em"><li>1896 nasce a Genova</li><li>1925 pubblica <b>Ossi di Seppia</b></li><li>1975 <b>Premio Nobel</b></li></ul></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function selectStyle(key){
+  currentStyle=key;
+  localStorage.setItem('fc-style',key);
+  renderStyleSection();
+  applyCardStyle();
+  toast('🎨 Stile aggiornato!');
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
