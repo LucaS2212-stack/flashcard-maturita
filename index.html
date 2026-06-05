@@ -1228,48 +1228,76 @@ let currentStyle = localStorage.getItem('fc-style') || 'b';
 
 function applyCardStyle(){
   const s = CARD_STYLES[currentStyle];
-  const fc = document.getElementById('fc');
-  if(!fc) return;
-  // front face
-  const front = fc.querySelector('.fc-front');
-  const back = fc.querySelector('.fc-back');
-  Object.keys(CARD_STYLES).forEach(k=>{
-    const st=CARD_STYLES[k];
-    front.classList.remove(st.frontClass);
-    back.classList.remove(st.backClass);
-  });
-  front.classList.add(s.frontClass);
-  back.classList.add(s.backClass);
-  // text
+  const front = document.querySelector('#fc .fc-front');
+  const back = document.querySelector('#fc .fc-back');
+  if(!front||!back) return;
+
+  // Apply background/border directly via inline style
+  const styles = {
+    a: { fg:'#ffffff', fb:'1.5px solid #ddd5c8', bg:'#f7f5f0', bb:'1.5px solid #ddd5c8', tc:'#444', tb:'#444', bold:'#1a1410', subj:'#8a7f72', tag:'#aaa', subjB:'#8a7f72', tagB:'#aaa', font:"'Outfit',sans-serif" },
+    b: { fg:'#ffffff', fb:'1.5px solid #ddd5c8', bg:'#faf8f3', bb:'1.5px solid #ddd5c8', tc:'#555', tb:'#555', bold:'#1a1410', subj:'#B5640A', tag:'#aaa', subjB:'#B5640A', tagB:'#aaa', font:"'Playfair Display',serif", accent:'#E8943A' },
+    c: { fg:'#1e1c19', fb:'1.5px solid #3a3730', bg:'#252320', bb:'1.5px solid #3a3730', tc:'#aaa', tb:'#aaa', bold:'#f5f0e8', subj:'#c4824a', tag:'#6b6760', subjB:'#c4824a', tagB:'#6b6760', font:"'Outfit',sans-serif" },
+    d: { fg:'#ffffff', fb:'2px solid #1a1410', bg:'#1a1410', bb:'2px solid #1a1410', tc:'#555', tb:'#c8c0b0', bold:'#1a1410', boldB:'#ffffff', subj:'#8a7f72', tag:'#aaa', subjB:'rgba(255,255,255,0.4)', tagB:'rgba(255,255,255,0.25)', font:"'Playfair Display',serif" }
+  }[currentStyle];
+
+  // Front
+  front.style.background = styles.fg;
+  front.style.border = styles.fb;
+
+  // Back
+  back.style.background = styles.bg;
+  back.style.border = styles.bb;
+
+  // Text elements - apply font and color via CSS vars on the faces
   const frontText = document.getElementById('fc-front-text');
   const backText = document.getElementById('fc-back-text');
   const subjectF = document.getElementById('fc-subject-f');
   const subjectB = document.getElementById('fc-subject-b');
   const tagF = document.getElementById('fc-tag-f');
   const tagB = document.getElementById('fc-tag-b');
+
   if(frontText){
-    frontText.className='fc-content '+s.textClass;
-    backText.className='fc-content '+s.textBackClass;
+    frontText.style.fontFamily = styles.font;
+    frontText.style.color = styles.tc;
+    frontText.style.fontSize = '14px';
+    frontText.style.lineHeight = '1.8';
+    // inject bold style via a style tag
+    updateBoldStyle(styles.bold, styles.boldB||styles.bold);
   }
-  if(subjectF){
-    subjectF.className='fc-subject'+(s.subjectClass?' '+s.subjectClass:'');
-    subjectB.className='fc-subject'+(s.subjectClass?' '+s.subjectClass:'');
+  if(backText){
+    backText.style.fontFamily = styles.font;
+    backText.style.color = styles.tb;
+    backText.style.fontSize = '14px';
+    backText.style.lineHeight = '1.8';
   }
-  if(tagF){
-    tagF.className='fc-tag'+(s.tagClass?' '+s.tagClass:'');
-    tagB.className='fc-tag'+(s.tagClass?' '+s.tagClass:'');
+  if(subjectF){ subjectF.style.color = styles.subj; }
+  if(subjectB){ subjectB.style.color = styles.subjB; }
+  if(tagF){ tagF.style.color = styles.tag; }
+  if(tagB){ tagB.style.color = styles.tagB; }
+
+  // Accent bar
+  front.querySelectorAll('.fc-style-b-accent').forEach(e=>e.remove());
+  back.querySelectorAll('.fc-style-b-accent').forEach(e=>e.remove());
+  if(styles.accent){
+    ['front','back'].forEach(side=>{
+      const face = side==='front'?front:back;
+      const a=document.createElement('div');
+      a.className='fc-style-b-accent';
+      a.style.background=styles.accent;
+      face.insertBefore(a,face.firstChild);
+    });
+    front.style.paddingLeft='44px';
+    back.style.paddingLeft='44px';
+  } else {
+    front.style.paddingLeft='';
+    back.style.paddingLeft='';
   }
-  // accent
-  let accEl = front.querySelector('.fc-style-b-accent');
-  if(s.accent && !accEl){
-    const a=document.createElement('div');a.className='fc-style-b-accent';
-    front.insertBefore(a,front.firstChild);
-    const a2=document.createElement('div');a2.className='fc-style-b-accent';
-    back.insertBefore(a2,back.firstChild);
-  } else if(!s.accent){
-    front.querySelectorAll('.fc-style-b-accent').forEach(e=>e.remove());
-    back.querySelectorAll('.fc-style-b-accent').forEach(e=>e.remove());
-  }
+}
+
+function updateBoldStyle(frontBold, backBold){
+  let el = document.getElementById('bold-style-tag');
+  if(!el){ el=document.createElement('style'); el.id='bold-style-tag'; document.head.appendChild(el); }
+  el.textContent = `#fc .fc-front b, #fc .fc-front strong { font-weight:700; color:${frontBold}; } #fc .fc-back b, #fc .fc-back strong { font-weight:700; color:${backBold}; }`;
 }
 
 function renderStyleSection(){
