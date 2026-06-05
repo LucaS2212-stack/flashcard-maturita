@@ -360,6 +360,7 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
   <nav>
     <button class="nav-btn active" onclick="goTo('home')" id="nav-home"><span class="nav-icon">📦</span>Scatola</button>
     <button class="nav-btn" onclick="goTo('sfoglia')" id="nav-sfoglia"><span class="nav-icon">🔍</span>Sfoglia</button>
+    <button class="nav-btn" onclick="goTo('materiali')" id="nav-materiali"><span class="nav-icon">📄</span>Materiali</button>
     <button class="nav-btn" onclick="goTo('stile')" id="nav-stile"><span class="nav-icon">🎨</span>Stile</button>
     <button class="nav-btn" onclick="goTo('mazzi')" id="nav-mazzi" style="display:none"><span class="nav-icon">📚</span>Mazzi</button>
     <button class="nav-btn" onclick="goTo('backup')" id="nav-backup" style="display:none"><span class="nav-icon">💾</span>Backup</button>
@@ -518,6 +519,12 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
     <div id="view-decks"></div>
     <div id="view-topics" style="display:none"></div>
     <div id="view-topic-detail" style="display:none"></div>
+  </div>
+
+  <!-- MATERIALI -->
+  <div class="section" id="section-materiali">
+    <div class="page-header"><h1>Materiali</h1><p>PDF e documenti per argomento</p></div>
+    <div id="materiali-content"></div>
   </div>
 
   <!-- STILE -->
@@ -769,6 +776,7 @@ function goTo(page){
   else if(page==='mazzi')showDecksView();
   else if(page==='sfoglia')renderBrowse();
   else if(page==='stile')renderStyleSection();
+  else if(page==='materiali')renderMateriali();
 }
 function goHome(){goTo('home');}
 
@@ -1214,6 +1222,38 @@ async function importData(e){
     }
   }
   await loadAll();renderHome();toast('📥 Importazione completata!');e.target.value='';
+}
+
+// ── MATERIALI ─────────────────────────────────────────────────────────────────
+function renderMateriali(){
+  const el = document.getElementById('materiali-content');
+  if(!el) return;
+  // collect all decks with at least one topic with PDFs
+  const decksWithPdfs = decks.filter(d => d.topics.some(t => t.pdfs.length > 0));
+  if(!decksWithPdfs.length){
+    el.innerHTML='<div class="empty"><div class="ei">📄</div><p>Nessun materiale disponibile ancora</p></div>';
+    return;
+  }
+  el.innerHTML = decksWithPdfs.map(d => `
+    <div style="margin-bottom:24px">
+      <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--ink)">${d.name}</div>
+      ${d.topics.filter(t=>t.pdfs.length>0).map(t=>`
+        <div style="margin-bottom:16px">
+          <div style="font-size:0.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:8px">📁 ${t.name}</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${t.pdfs.map(p=>`
+              <div class="pdf-item">
+                <div class="pdf-icon">📄</div>
+                <div class="pdf-info">
+                  <div class="pdf-name">${p.name}</div>
+                </div>
+                <div class="pdf-actions">
+                  <a href="${convertDriveUrl(p.url)}" target="_blank" class="btn btn-primary btn-sm">Apri →</a>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
 }
 
 // ── STILE ────────────────────────────────────────────────────────────────────
