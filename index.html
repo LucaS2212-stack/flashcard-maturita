@@ -629,7 +629,6 @@ function buildToolbar(tbId, edId) {
     html += '<button class="rte-btn"' + st + ' title="' + title + '" onmousedown="event.preventDefault();execRTE(\'' + t.cmd + '\',\'' + edId + '\')">' + t.label + '</button>';
   }
   tb.innerHTML = html;
-  setupAutoFraction(edId);
 }
 
 function execRTE(cmd, id) {
@@ -637,39 +636,6 @@ function execRTE(cmd, id) {
   document.execCommand(cmd, false, null);
 }
 
-function setupAutoFraction(edId) {
-  var ed = document.getElementById(edId);
-  if (!ed || ed._fracSetup) return;
-  ed._fracSetup = true;
-  ed.addEventListener('keydown', function(evt) {
-    if (evt.key !== ' ' && evt.key !== 'Enter') return;
-    var sel = window.getSelection();
-    if (!sel || !sel.rangeCount) return;
-    var range = sel.getRangeAt(0);
-    var node = range.startContainer;
-    if (node.nodeType !== 3) return;
-    var pos = range.startOffset;
-    var before = node.textContent.slice(0, pos);
-    var slash = before.lastIndexOf('/');
-    if (slash < 1) return;
-    var num = before.slice(0, slash).match(/(\S+)$/);
-    var den = before.slice(slash + 1);
-    if (!num || !den.length) return;
-    num = num[1];
-    evt.preventDefault();
-    var del = document.createRange();
-    del.setStart(node, pos - num.length - 1 - den.length);
-    del.setEnd(node, pos);
-    del.deleteContents();
-    sel.removeAllRanges();
-    sel.addRange(del);
-    var frac = '<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px">'
-      + '<span style="border-bottom:1.5px solid;padding:0 2px;font-size:0.9em">' + num + '</span>'
-      + '<span style="padding:0 2px;font-size:0.9em">' + den + '</span>'
-      + '</span>\u00a0';
-    document.execCommand('insertHTML', false, frac);
-  });
-}
 
 function getRTE(id) { return document.getElementById(id).innerHTML.trim(); }
 function setRTE(id, html) { document.getElementById(id).innerHTML = html || ''; }
