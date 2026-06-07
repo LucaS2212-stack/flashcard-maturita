@@ -257,6 +257,10 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .rte-editor:empty::before { content: attr(data-placeholder); color: var(--muted); pointer-events: none; }
 .math-formula { display: inline-block; }
 .MathJax { font-size: 1.1em !important; }
+.sym-btn { background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 0.95rem; cursor: pointer; transition: all .15s; font-family: 'Playfair Display', serif; color: var(--ink); }
+.sym-btn:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.sym-btn:active { transform: scale(0.93); }
+.sym-wide { font-family: 'Outfit', sans-serif; font-size: 0.82rem; padding: 6px 12px; }
 
 /* CARDS LIST */
 .cards-list { display: flex; flex-direction: column; gap: 10px; }
@@ -328,6 +332,66 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 <div class="loader" id="loader" style="display:none">
   <div class="loader-spinner"></div>
   <p>Caricamento...</p>
+</div>
+
+<!-- FORMULA MODAL -->
+<div class="modal-overlay" id="formula-modal" style="display:none" onclick="closeModal('formula-modal',event)">
+  <div class="modal" style="max-width:480px">
+    <h3>➕ Inserisci formula</h3>
+    <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;min-height:52px;font-size:1.1rem;font-family:'Playfair Display',serif" id="formula-preview">Anteprima formula...</div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:14px">
+      <input type="text" id="formula-input" placeholder="es. F = m · a" 
+        style="width:100%;background:transparent;border:none;outline:none;font-family:'Outfit',sans-serif;font-size:1rem;color:var(--ink)"
+        oninput="updateFormulaPreview()">
+    </div>
+    <!-- Symbol groups -->
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+      <div>
+        <div class="section-label" style="margin-bottom:6px">Operatori</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <button class="sym-btn" onclick="insertSym('·')">·</button><button class="sym-btn" onclick="insertSym('×')">×</button><button class="sym-btn" onclick="insertSym('÷')">÷</button><button class="sym-btn" onclick="insertSym('±')">±</button><button class="sym-btn" onclick="insertSym('=')">=</button><button class="sym-btn" onclick="insertSym('≠')">≠</button><button class="sym-btn" onclick="insertSym('≈')">≈</button><button class="sym-btn" onclick="insertSym('<')"><</button><button class="sym-btn" onclick="insertSym('>')">></button><button class="sym-btn" onclick="insertSym('≤')">≤</button><button class="sym-btn" onclick="insertSym('≥')">≥</button><button class="sym-btn" onclick="insertSym('√')">√</button><button class="sym-btn" onclick="insertSym('∞')">∞</button><button class="sym-btn" onclick="insertSym('%')">%</button>
+        </div>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:6px">Struttura</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <button class="sym-btn sym-wide" onclick="insertTemplate('frac')">a/b ÷</button>
+          <button class="sym-btn sym-wide" onclick="insertTemplate('sup')">xⁿ apice</button>
+          <button class="sym-btn sym-wide" onclick="insertTemplate('sub')">xₙ pedice</button>
+          <button class="sym-btn sym-wide" onclick="insertTemplate('sqrt')">√x radice</button>
+          <button class="sym-btn sym-wide" onclick="insertTemplate('supsub')">xₙᵐ entrambi</button>
+        </div>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:6px">Lettere greche</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <button class="sym-btn" onclick="insertSym('α')">α</button><button class="sym-btn" onclick="insertSym('β')">β</button><button class="sym-btn" onclick="insertSym('γ')">γ</button><button class="sym-btn" onclick="insertSym('δ')">δ</button><button class="sym-btn" onclick="insertSym('ε')">ε</button><button class="sym-btn" onclick="insertSym('θ')">θ</button><button class="sym-btn" onclick="insertSym('λ')">λ</button><button class="sym-btn" onclick="insertSym('μ')">μ</button><button class="sym-btn" onclick="insertSym('π')">π</button><button class="sym-btn" onclick="insertSym('ρ')">ρ</button><button class="sym-btn" onclick="insertSym('σ')">σ</button><button class="sym-btn" onclick="insertSym('τ')">τ</button><button class="sym-btn" onclick="insertSym('φ')">φ</button><button class="sym-btn" onclick="insertSym('ω')">ω</button><button class="sym-btn" onclick="insertSym('Δ')">Δ</button><button class="sym-btn" onclick="insertSym('Σ')">Σ</button><button class="sym-btn" onclick="insertSym('Ω')">Ω</button>
+        </div>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:6px">Apici comuni</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <button class="sym-btn" onclick="insertSym('²')">²</button><button class="sym-btn" onclick="insertSym('³')">³</button><button class="sym-btn" onclick="insertSym('⁴')">⁴</button><button class="sym-btn" onclick="insertSym('⁻¹')">⁻¹</button><button class="sym-btn" onclick="insertSym('⁻²')">⁻²</button><button class="sym-btn" onclick="insertSym('⁰')">⁰</button><button class="sym-btn" onclick="insertSym('¹')">¹</button>
+        </div>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:6px">Pedici comuni</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <button class="sym-btn" onclick="insertSym('₀')">₀</button><button class="sym-btn" onclick="insertSym('₁')">₁</button><button class="sym-btn" onclick="insertSym('₂')">₂</button><button class="sym-btn" onclick="insertSym('₃')">₃</button><button class="sym-btn" onclick="insertSym('₄')">₄</button><button class="sym-btn" onclick="insertSym('₅')">₅</button><button class="sym-btn" onclick="insertSym('ₙ')">ₙ</button>
+        </div>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:6px">Unità di misura</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <button class="sym-btn sym-wide" onclick="insertSym('N')">N</button><button class="sym-btn sym-wide" onclick="insertSym('Pa')">Pa</button><button class="sym-btn sym-wide" onclick="insertSym('J')">J</button><button class="sym-btn sym-wide" onclick="insertSym('W')">W</button><button class="sym-btn sym-wide" onclick="insertSym('V')">V</button><button class="sym-btn sym-wide" onclick="insertSym('A')">A</button><button class="sym-btn sym-wide" onclick="insertSym('Ω')">Ω</button><button class="sym-btn sym-wide" onclick="insertSym('m/s')">m/s</button><button class="sym-btn sym-wide" onclick="insertSym('m/s²')">m/s²</button><button class="sym-btn sym-wide" onclick="insertSym('kg·m/s')">kg·m/s</button><button class="sym-btn sym-wide" onclick="insertSym('N/m²')">N/m²</button><button class="sym-btn sym-wide" onclick="insertSym('kN')">kN</button><button class="sym-btn sym-wide" onclick="insertSym('MPa')">MPa</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModalDirect('formula-modal')">Annulla</button>
+      <button class="btn btn-primary" onclick="confirmFormula()">Inserisci ✓</button>
+    </div>
+  </div>
 </div>
 
 <!-- EDIT CARD MODAL -->
@@ -601,31 +665,64 @@ function buildToolbar(tbId, edId) {
   }).join('');
 }
 
-function insertFraction(edId) {
-  const ed = document.getElementById(edId);
-  ed.focus();
-  // Check if text is selected — use it as numerator
-  const sel = window.getSelection();
-  let num = '', den = '';
-  if(sel && sel.rangeCount && !sel.isCollapsed && ed.contains(sel.anchorNode)){
-    num = sel.toString();
-  }
-  const numInput = num || prompt('Numeratore:','');
-  if(numInput===null) return;
-  const denInput = prompt('Denominatore:','');
-  if(denInput===null) return;
-  const latex = `\\(\\dfrac{${numInput}}{${denInput}}\\)`;
-  document.execCommand('insertHTML', false, `<span class="math-formula">${latex}</span>&nbsp;`);
-  rerenderMath(ed);
+let formulaTargetEditor = null;
+
+function insertFraction(edId) { openFormulaModal(edId); }
+function insertFormula(edId) { openFormulaModal(edId); }
+
+function openFormulaModal(edId){
+  formulaTargetEditor = edId;
+  document.getElementById('formula-input').value = '';
+  document.getElementById('formula-preview').textContent = 'Anteprima formula...';
+  document.getElementById('formula-modal').style.display = 'flex';
+  setTimeout(()=>document.getElementById('formula-input').focus(), 100);
 }
 
-function insertFormula(edId) {
-  const ed = document.getElementById(edId);
+function insertSym(s){
+  const input = document.getElementById('formula-input');
+  const pos = input.selectionStart;
+  input.value = input.value.slice(0,pos) + s + input.value.slice(input.selectionEnd);
+  input.selectionStart = input.selectionEnd = pos + s.length;
+  input.focus();
+  updateFormulaPreview();
+}
+
+function insertTemplate(type){
+  const input = document.getElementById('formula-input');
+  const sel = input.value.slice(input.selectionStart, input.selectionEnd) || 'x';
+  const pos = input.selectionStart;
+  let insert = '';
+  if(type==='frac') insert = sel+'/';
+  else if(type==='sup') insert = sel+'²';
+  else if(type==='sub') insert = sel+'₀';
+  else if(type==='sqrt') insert = '√('+sel+')';
+  else if(type==='supsub') insert = sel+'₀²';
+  input.value = input.value.slice(0,pos) + insert + input.value.slice(input.selectionEnd);
+  input.selectionStart = input.selectionEnd = pos + insert.length;
+  input.focus();
+  updateFormulaPreview();
+}
+
+function updateFormulaPreview(){
+  const val = document.getElementById('formula-input').value;
+  const preview = document.getElementById('formula-preview');
+  if(!val){ preview.textContent = 'Anteprima formula...'; return; }
+  // Convert simple fraction notation a/b to visual fraction
+  let display = val.replace(/([^/\s]+)\/([^/\s]+)/g, '<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 4px;line-height:1.1"><span style="border-bottom:1.5px solid currentColor;padding:0 3px;font-size:0.9em">$1</span><span style="padding:0 3px;font-size:0.9em">$2</span></span>');
+  preview.innerHTML = display;
+}
+
+function confirmFormula(){
+  const val = document.getElementById('formula-input').value.trim();
+  if(!val){ toast('Scrivi una formula!'); return; }
+  const ed = document.getElementById(formulaTargetEditor);
+  if(!ed){ closeModalDirect('formula-modal'); return; }
   ed.focus();
-  const formula = prompt('Inserisci formula LaTeX (es. F = m \\cdot a):','');
-  if(!formula) return;
-  document.execCommand('insertHTML', false, `<span class="math-formula">\\(${formula}\\)</span>&nbsp;`);
-  rerenderMath(ed);
+  // Convert a/b fractions to visual HTML
+  let html = val.replace(/([^/\s]+)\/([^/\s]+)/g,
+    '<span class="math-frac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px;line-height:1.2"><span style="border-bottom:1.5px solid currentColor;padding:0 2px;font-size:0.85em">$1</span><span style="padding:0 2px;font-size:0.85em">$2</span></span>');
+  document.execCommand('insertHTML', false, '<span class="math-formula" style="font-family:'Playfair Display',serif">'+html+'</span>&nbsp;');
+  closeModalDirect('formula-modal');
 }
 
 function rerenderMath(el) {
@@ -1232,7 +1329,7 @@ function openEditModal(id){
   document.getElementById('edit-modal').style.display='flex';
 }
 function closeModal(id,e){if(e.target===document.getElementById(id))closeModalDirect(id);}
-function closeModalDirect(id){document.getElementById(id).style.display='none';if(id==='edit-modal')editingCardId=null;if(id==='pdf-modal')addingPdfTopicId=null;}
+function closeModalDirect(id){document.getElementById(id).style.display='none';if(id==='edit-modal')editingCardId=null;if(id==='pdf-modal')addingPdfTopicId=null;if(id==='formula-modal')formulaTargetEditor=null;}
 async function saveEdit(){
   if(!editingCardId)return;
   const front=getRTE('edit-front'),back=getRTE('edit-back');
