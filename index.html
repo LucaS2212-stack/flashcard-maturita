@@ -9,6 +9,14 @@
 <title>Flashcard Studio</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['\\(','\\)'],['$','$']], displayMath: [['\\[','\\]'],['$$','$$']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] },
+  startup: { typeset: false }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
 <style>
 :root {
   --bg: #f5f0e8; --surface: #ffffff; --surface2: #f0ebe0;
@@ -247,6 +255,8 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .rte-editor { min-height: 90px; padding: 11px 13px; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.95rem; color: var(--ink); line-height: 1.55; }
 .rte-editor ul, .rte-editor ol { padding-left: 1.4em; }
 .rte-editor:empty::before { content: attr(data-placeholder); color: var(--muted); pointer-events: none; }
+.math-formula { display: inline-block; }
+.MathJax { font-size: 1.1em !important; }
 
 /* CARDS LIST */
 .cards-list { display: flex; flex-direction: column; gap: 10px; }
@@ -578,10 +588,51 @@ const RTE_TOOLS = [
   {cmd:'bold',label:'<b>B</b>'},{cmd:'italic',label:'<i>I</i>'},{cmd:'underline',label:'<u>U</u>'},
   {sep:true},{cmd:'insertUnorderedList',label:'• Lista'},{cmd:'insertOrderedList',label:'1. Lista'},
   {sep:true},{cmd:'justifyLeft',label:'⬛◻◻'},{cmd:'justifyCenter',label:'◻⬛◻'},{cmd:'justifyRight',label:'◻◻⬛'},
+  {sep:true},{cmd:'superscript',label:'x²',title:'Apice'},{cmd:'subscript',label:'x₂',title:'Pedice'},
+  {sep:true},{special:'fraction',label:'a/b',title:'Frazione'},{special:'formula',label:'∑',title:'Formula matematica'},
   {sep:true},{cmd:'removeFormat',label:'✕'}
 ];
 function buildToolbar(tbId, edId) {
-  document.getElementById(tbId).innerHTML = RTE_TOOLS.map(t=>t.sep?'<div class="rte-sep"></div>':`<button class="rte-btn" title="${t.label}" onmousedown="event.preventDefault();execRTE('${t.cmd}','${edId}')">${t.label}</button>`).join('');
+  document.getElementById(tbId).innerHTML = RTE_TOOLS.map(t=>{
+    if(t.sep) return '<div class="rte-sep"></div>';
+    if(t.special==='fraction') return `<button class="rte-btn" title="${t.title}" onmousedown="event.preventDefault();insertFraction('${edId}')">${t.label}</button>`;
+    if(t.special==='formula') return `<button class="rte-btn" title="${t.title}" onmousedown="event.preventDefault();insertFormula('${edId}')">${t.label}</button>`;
+    return `<button class="rte-btn" title="${t.title||t.label}" onmousedown="event.preventDefault();execRTE('${t.cmd}','${edId}')">${t.label}</button>`;
+  }).join('');
+}
+
+function insertFraction(edId) {
+  const ed = document.getElementById(edId);
+  ed.focus();
+  // Check if text is selected — use it as numerator
+  const sel = window.getSelection();
+  let num = '', den = '';
+  if(sel && sel.rangeCount && !sel.isCollapsed && ed.contains(sel.anchorNode)){
+    num = sel.toString();
+  }
+  const numInput = num || prompt('Numeratore:','');
+  if(numInput===null) return;
+  const denInput = prompt('Denominatore:','');
+  if(denInput===null) return;
+  const latex = `\\(\\dfrac{${numInput}}{${denInput}}\\)`;
+  document.execCommand('insertHTML', false, `<span class="math-formula">${latex}</span>&nbsp;`);
+  rerenderMath(ed);
+}
+
+function insertFormula(edId) {
+  const ed = document.getElementById(edId);
+  ed.focus();
+  const formula = prompt('Inserisci formula LaTeX (es. F = m \\cdot a):','');
+  if(!formula) return;
+  document.execCommand('insertHTML', false, `<span class="math-formula">\\(${formula}\\)</span>&nbsp;`);
+  rerenderMath(ed);
+}
+
+function rerenderMath(el) {
+  if(window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetClear([el]);
+    MathJax.typesetPromise([el]).catch(err=>console.log(err));
+  }
 }
 function execRTE(cmd,id){document.getElementById(id).focus();document.execCommand(cmd,false,null);}
 function getRTE(id){return document.getElementById(id).innerHTML.trim();}
@@ -798,6 +849,13 @@ function showSessionCard(){
   document.getElementById('fc-front-text').innerHTML=card.front;
   document.getElementById('fc-back-text').innerHTML=card.back;
   applyCardStyle();
+  // Render math formulas
+  setTimeout(()=>{
+    if(window.MathJax&&MathJax.typesetPromise){
+      MathJax.typesetClear([document.getElementById('fc-front-text'),document.getElementById('fc-back-text')]);
+      MathJax.typesetPromise([document.getElementById('fc-front-text'),document.getElementById('fc-back-text')]).catch(e=>console.log(e));
+    }
+  },100);
   document.getElementById('fc-subject-f').textContent=(card.deckName+' › '+card.topicName).toUpperCase();
   document.getElementById('fc-subject-b').textContent=(card.deckName+' › '+card.topicName).toUpperCase();
   document.getElementById('sess-flip-actions').style.display='flex';
