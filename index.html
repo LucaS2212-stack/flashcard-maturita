@@ -598,107 +598,86 @@ let editingCardId = null, addingPdfTopicId = null;
 let browseTopicFilter = 'all-topics';
 let activeTopicTab = 'cards';
 
-// ── RTE ───────────────────────────────────────────────────────────────────────
+// ── RTE ────────────────────────────────────────────────────────────────────────
 const RTE_TOOLS = [
-  {cmd:'bold',label:'B',style:'font-weight:800'},{cmd:'italic',label:'I',style:'font-style:italic'},{cmd:'underline',label:'U',style:'text-decoration:underline'},
-  {sep:true},{cmd:'insertUnorderedList',label:'&#8226; Lista'},{cmd:'insertOrderedList',label:'1. Lista'},
-  {sep:true},{cmd:'justifyLeft',label:'&#8676;'},{cmd:'justifyCenter',label:'&#8596;'},{cmd:'justifyRight',label:'&#8677;'},
-  {sep:true},{cmd:'superscript',label:'x&#178;',title:'Apice'},{cmd:'subscript',label:'x&#8322;',title:'Pedice'},{special:'fraction',label:'a/b',title:'Frazione'},
-  {sep:true},{cmd:'removeFormat',label:'&#10005;'}
+  {cmd:'bold',label:'B',s:'font-weight:800'},
+  {cmd:'italic',label:'I',s:'font-style:italic'},
+  {cmd:'underline',label:'U',s:'text-decoration:underline'},
+  {sep:true},
+  {cmd:'insertUnorderedList',label:'Lista'},
+  {cmd:'insertOrderedList',label:'1.Lista'},
+  {sep:true},
+  {cmd:'justifyLeft',label:'Sx'},
+  {cmd:'justifyCenter',label:'Cx'},
+  {cmd:'justifyRight',label:'Dx'},
+  {sep:true},
+  {cmd:'superscript',label:'x2',title:'Apice'},
+  {cmd:'subscript',label:'xn',title:'Pedice'},
+  {sep:true},
+  {cmd:'removeFormat',label:'X'}
 ];
+
 function buildToolbar(tbId, edId) {
-  document.getElementById(tbId).innerHTML = RTE_TOOLS.map(function(t){
-    if(t.sep) return '<div class="rte-sep"></div>';
-    var st = t.style ? ' style="'+t.style+'"' : '';
-    if(t.special==='fraction') return '<button class="rte-btn" title="Frazione" onmousedown="event.preventDefault();insertFraction(''+edId+'')">a/b</button>';
-    return '<button class="rte-btn"'+st+' title="'+(t.title||t.label)+'" onmousedown="event.preventDefault();execRTE(''+t.cmd+'',''+edId+'')">'+t.label+'</button>';
-  }).join('');
+  var tb = document.getElementById(tbId);
+  if (!tb) return;
+  var html = '';
+  for (var i = 0; i < RTE_TOOLS.length; i++) {
+    var t = RTE_TOOLS[i];
+    if (t.sep) { html += '<div class="rte-sep"></div>'; continue; }
+    var st = t.s ? ' style="' + t.s + '"' : '';
+    var title = t.title || t.label;
+    html += '<button class="rte-btn"' + st + ' title="' + title + '" onmousedown="event.preventDefault();execRTE(\'' + t.cmd + '\',\'' + edId + '\')">' + t.label + '</button>';
+  }
+  tb.innerHTML = html;
   setupAutoFraction(edId);
 }
 
-let fracTargetEditor = null;
-
-function insertFraction(edId) {
-  fracTargetEditor = edId;
-  document.getElementById('frac-num').value = '';
-  document.getElementById('frac-den').value = '';
-  document.getElementById('frac-preview').innerHTML = '';
-  document.getElementById('frac-modal').style.display = 'flex';
-  setTimeout(()=>document.getElementById('frac-num').focus(), 100);
+function execRTE(cmd, id) {
+  document.getElementById(id).focus();
+  document.execCommand(cmd, false, null);
 }
-
-function updateFracPreview() {
-  const num = document.getElementById('frac-num').value || '■';
-  const den = document.getElementById('frac-den').value || '■';
-  document.getElementById('frac-preview').innerHTML =
-    '<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.2">' +
-    '<span style="border-bottom:2px solid currentColor;padding:0 4px;font-size:0.95em">' + num + '</span>' +
-    '<span style="padding:0 4px;font-size:0.95em">' + den + '</span></span>';
-}
-
-function confirmFrac() {
-  const num = document.getElementById('frac-num').value.trim();
-  const den = document.getElementById('frac-den').value.trim();
-  if(!num || !den) { toast('Inserisci numeratore e denominatore!'); return; }
-  const ed = document.getElementById(fracTargetEditor);
-  if(!ed) { closeModalDirect('frac-modal'); return; }
-  ed.focus();
-  const html = '<span class="math-frac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px;line-height:1.2"><span style="border-bottom:1.5px solid currentColor;padding:0 2px;font-size:0.85em">' + num + '</span><span style="padding:0 2px;font-size:0.85em">' + den + '</span></span>';
-  document.execCommand('insertHTML', false, html + '&nbsp;');
-  closeModalDirect('frac-modal');
-}
-
-function execRTE(cmd,id){document.getElementById(id).focus();document.execCommand(cmd,false,null);}
-
-
 
 function setupAutoFraction(edId) {
   var ed = document.getElementById(edId);
   if (!ed || ed._fracSetup) return;
   ed._fracSetup = true;
-  ed.addEventListener('keydown', function(e) {
-    if (e.key !== ' ' && e.key !== 'Enter') return;
+  ed.addEventListener('keydown', function(evt) {
+    if (evt.key !== ' ' && evt.key !== 'Enter') return;
     var sel = window.getSelection();
     if (!sel || !sel.rangeCount) return;
     var range = sel.getRangeAt(0);
     var node = range.startContainer;
     if (node.nodeType !== 3) return;
-    var text = node.textContent;
     var pos = range.startOffset;
-    var textBefore = text.slice(0, pos);
-    var slashIdx = textBefore.lastIndexOf('/');
-    if (slashIdx < 1) return;
-    var afterSlash = textBefore.slice(slashIdx + 1);
-    var beforeSlash = textBefore.slice(0, slashIdx);
-    var numMatch = beforeSlash.match(/([^\s]+)$/);
-    if (!numMatch || !afterSlash) return;
-    var num = numMatch[1];
-    var den = afterSlash;
-    if (!num || !den) return;
-    e.preventDefault();
-    var startPos = pos - num.length - 1 - den.length;
-    var delRange = document.createRange();
-    delRange.setStart(node, startPos);
-    delRange.setEnd(node, pos);
-    delRange.deleteContents();
+    var before = node.textContent.slice(0, pos);
+    var slash = before.lastIndexOf('/');
+    if (slash < 1) return;
+    var num = before.slice(0, slash).match(/(\S+)$/);
+    var den = before.slice(slash + 1);
+    if (!num || !den.length) return;
+    num = num[1];
+    evt.preventDefault();
+    var del = document.createRange();
+    del.setStart(node, pos - num.length - 1 - den.length);
+    del.setEnd(node, pos);
+    del.deleteContents();
     sel.removeAllRanges();
-    sel.addRange(delRange);
-    var topStyle = 'display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px;line-height:1.2';
-    var numStyle = 'border-bottom:1.5px solid currentColor;padding:0 2px;font-size:0.85em';
-    var denStyle = 'padding:0 2px;font-size:0.85em';
-    var h = '<span style="' + topStyle + '"><span style="' + numStyle + '">' + num + '</span><span style="' + denStyle + '">' + den + '</span></span> ';
-    document.execCommand('insertHTML', false, h);
+    sel.addRange(del);
+    var frac = '<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px">'
+      + '<span style="border-bottom:1.5px solid;padding:0 2px;font-size:0.9em">' + num + '</span>'
+      + '<span style="padding:0 2px;font-size:0.9em">' + den + '</span>'
+      + '</span>\u00a0';
+    document.execCommand('insertHTML', false, frac);
   });
 }
 
-function getRTE(id){return document.getElementById(id).innerHTML.trim();}
-function setRTE(id,html){document.getElementById(id).innerHTML=html||'';}
-function clearRTE(id){document.getElementById(id).innerHTML='';}
-function isRTEEmpty(id){return !document.getElementById(id).innerText.trim();}
-function buildAllToolbars(){
-  buildToolbar('edit-tb-front','edit-front');
-  buildToolbar('edit-tb-back','edit-back');
-  // topic toolbars built dynamically
+function getRTE(id) { return document.getElementById(id).innerHTML.trim(); }
+function setRTE(id, html) { document.getElementById(id).innerHTML = html || ''; }
+function clearRTE(id) { document.getElementById(id).innerHTML = ''; }
+function isRTEEmpty(id) { return !document.getElementById(id).innerText.trim(); }
+function buildAllToolbars() {
+  buildToolbar('edit-tb-front', 'edit-front');
+  buildToolbar('edit-tb-back', 'edit-back');
 }
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
@@ -1445,9 +1424,6 @@ function applyCardStyle(){
   }
 }
 
-
-  el.textContent = `#fc .fc-front b, #fc .fc-front strong { font-weight:700; color:${frontBold}; } #fc .fc-back b, #fc .fc-back strong { font-weight:700; color:${backBold}; }`;
-}
 
 function renderStyleSection(){
   const grid = document.getElementById('style-grid');
