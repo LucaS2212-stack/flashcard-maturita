@@ -9,14 +9,7 @@
 <title>Flashcard Studio</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-MathJax = {
-  tex: { inlineMath: [['\\(','\\)'],['$','$']], displayMath: [['\\[','\\]'],['$$','$$']] },
-  options: { skipHtmlTags: ['script','noscript','style','textarea'] },
-  startup: { typeset: false }
-};
-</script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+
 <style>
 :root {
   --bg: #f5f0e8; --surface: #ffffff; --surface2: #f0ebe0;
@@ -255,12 +248,8 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .rte-editor { min-height: 90px; padding: 11px 13px; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.95rem; color: var(--ink); line-height: 1.55; }
 .rte-editor ul, .rte-editor ol { padding-left: 1.4em; }
 .rte-editor:empty::before { content: attr(data-placeholder); color: var(--muted); pointer-events: none; }
-.math-formula { display: inline-block; }
-.MathJax { font-size: 1.1em !important; }
-.sym-btn { background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 0.95rem; cursor: pointer; transition: all .15s; font-family: 'Playfair Display', serif; color: var(--ink); }
-.sym-btn:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.sym-btn:active { transform: scale(0.93); }
-.sym-wide { font-family: 'Outfit', sans-serif; font-size: 0.82rem; padding: 6px 12px; }
+
+
 
 /* CARDS LIST */
 .cards-list { display: flex; flex-direction: column; gap: 10px; }
@@ -334,62 +323,24 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
   <p>Caricamento...</p>
 </div>
 
-<!-- FORMULA MODAL -->
-<div class="modal-overlay" id="formula-modal" style="display:none" onclick="closeModal('formula-modal',event)">
-  <div class="modal" style="max-width:480px">
-    <h3>➕ Inserisci formula</h3>
-    <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;min-height:52px;font-size:1.1rem;font-family:'Playfair Display',serif" id="formula-preview">Anteprima formula...</div>
-    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:14px">
-      <input type="text" id="formula-input" placeholder="es. F = m · a" 
-        style="width:100%;background:transparent;border:none;outline:none;font-family:'Outfit',sans-serif;font-size:1rem;color:var(--ink)"
-        oninput="updateFormulaPreview()">
+<!-- FRACTION MODAL -->
+<div class="modal-overlay" id="frac-modal" style="display:none" onclick="closeModal('frac-modal',event)">
+  <div class="modal" style="max-width:320px;text-align:center">
+    <h3 style="margin-bottom:16px">Inserisci frazione</h3>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:20px">
+      <input id="frac-num" type="text" placeholder="Numeratore" oninput="updateFracPreview()"
+        style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-family:'Outfit',sans-serif;font-size:1rem;color:var(--ink);outline:none;text-align:center">
+      <div style="width:80px;height:2px;background:var(--ink);border-radius:2px"></div>
+      <input id="frac-den" type="text" placeholder="Denominatore" oninput="updateFracPreview()"
+        style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-family:'Outfit',sans-serif;font-size:1rem;color:var(--ink);outline:none;text-align:center">
     </div>
-    <!-- Symbol groups -->
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
-      <div>
-        <div class="section-label" style="margin-bottom:6px">Operatori</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">
-          <button class="sym-btn" onclick="insertSym('·')">·</button><button class="sym-btn" onclick="insertSym('×')">×</button><button class="sym-btn" onclick="insertSym('÷')">÷</button><button class="sym-btn" onclick="insertSym('±')">±</button><button class="sym-btn" onclick="insertSym('=')">=</button><button class="sym-btn" onclick="insertSym('≠')">≠</button><button class="sym-btn" onclick="insertSym('≈')">≈</button><button class="sym-btn" onclick="insertSym(this.getAttribute('data-s'))" data-s="<"><</button><button class="sym-btn" onclick="insertSym(this.getAttribute('data-s'))" data-s=">">></button><button class="sym-btn" onclick="insertSym('≤')">≤</button><button class="sym-btn" onclick="insertSym('≥')">≥</button><button class="sym-btn" onclick="insertSym('√')">√</button><button class="sym-btn" onclick="insertSym('∞')">∞</button><button class="sym-btn" onclick="insertSym('%')">%</button>
-        </div>
-      </div>
-      <div>
-        <div class="section-label" style="margin-bottom:6px">Struttura</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">
-          <button class="sym-btn sym-wide" onclick="insertTemplate('frac')">a/b ÷</button>
-          <button class="sym-btn sym-wide" onclick="insertTemplate('sup')">xⁿ apice</button>
-          <button class="sym-btn sym-wide" onclick="insertTemplate('sub')">xₙ pedice</button>
-          <button class="sym-btn sym-wide" onclick="insertTemplate('sqrt')">√x radice</button>
-          <button class="sym-btn sym-wide" onclick="insertTemplate('supsub')">xₙᵐ entrambi</button>
-        </div>
-      </div>
-      <div>
-        <div class="section-label" style="margin-bottom:6px">Lettere greche</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">
-          <button class="sym-btn" onclick="insertSym('α')">α</button><button class="sym-btn" onclick="insertSym('β')">β</button><button class="sym-btn" onclick="insertSym('γ')">γ</button><button class="sym-btn" onclick="insertSym('δ')">δ</button><button class="sym-btn" onclick="insertSym('ε')">ε</button><button class="sym-btn" onclick="insertSym('θ')">θ</button><button class="sym-btn" onclick="insertSym('λ')">λ</button><button class="sym-btn" onclick="insertSym('μ')">μ</button><button class="sym-btn" onclick="insertSym('π')">π</button><button class="sym-btn" onclick="insertSym('ρ')">ρ</button><button class="sym-btn" onclick="insertSym('σ')">σ</button><button class="sym-btn" onclick="insertSym('τ')">τ</button><button class="sym-btn" onclick="insertSym('φ')">φ</button><button class="sym-btn" onclick="insertSym('ω')">ω</button><button class="sym-btn" onclick="insertSym('Δ')">Δ</button><button class="sym-btn" onclick="insertSym('Σ')">Σ</button><button class="sym-btn" onclick="insertSym('Ω')">Ω</button>
-        </div>
-      </div>
-      <div>
-        <div class="section-label" style="margin-bottom:6px">Apici comuni</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">
-          <button class="sym-btn" onclick="insertSym('²')">²</button><button class="sym-btn" onclick="insertSym('³')">³</button><button class="sym-btn" onclick="insertSym('⁴')">⁴</button><button class="sym-btn" onclick="insertSym(this.getAttribute('data-s'))" data-s="⁻¹">⁻¹</button><button class="sym-btn" onclick="insertSym(this.getAttribute('data-s'))" data-s="⁻²">⁻²</button><button class="sym-btn" onclick="insertSym('⁰')">⁰</button><button class="sym-btn" onclick="insertSym('¹')">¹</button>
-        </div>
-      </div>
-      <div>
-        <div class="section-label" style="margin-bottom:6px">Pedici comuni</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">
-          <button class="sym-btn" onclick="insertSym('₀')">₀</button><button class="sym-btn" onclick="insertSym('₁')">₁</button><button class="sym-btn" onclick="insertSym('₂')">₂</button><button class="sym-btn" onclick="insertSym('₃')">₃</button><button class="sym-btn" onclick="insertSym('₄')">₄</button><button class="sym-btn" onclick="insertSym('₅')">₅</button><button class="sym-btn" onclick="insertSym('ₙ')">ₙ</button>
-        </div>
-      </div>
-      <div>
-        <div class="section-label" style="margin-bottom:6px">Unità di misura</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">
-          <button class="sym-btn sym-wide" onclick="insertSym('N')">N</button><button class="sym-btn sym-wide" onclick="insertSym('Pa')">Pa</button><button class="sym-btn sym-wide" onclick="insertSym('J')">J</button><button class="sym-btn sym-wide" onclick="insertSym('W')">W</button><button class="sym-btn sym-wide" onclick="insertSym('V')">V</button><button class="sym-btn sym-wide" onclick="insertSym('A')">A</button><button class="sym-btn sym-wide" onclick="insertSym('Ω')">Ω</button><button class="sym-btn sym-wide" onclick="insertSym(this.getAttribute('data-s'))" data-s="m/s">m/s</button><button class="sym-btn sym-wide" onclick="insertSym(this.getAttribute('data-s'))" data-s="m/s²">m/s²</button><button class="sym-btn sym-wide" onclick="insertSym(this.getAttribute('data-s'))" data-s="kg·m/s">kg·m/s</button><button class="sym-btn sym-wide" onclick="insertSym(this.getAttribute('data-s'))" data-s="N/m²">N/m²</button><button class="sym-btn sym-wide" onclick="insertSym('kN')">kN</button><button class="sym-btn sym-wide" onclick="insertSym('MPa')">MPa</button>
-        </div>
-      </div>
+    <div style="background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:16px;min-height:60px;display:flex;align-items:center;justify-content:center">
+      <span style="font-size:0.75rem;color:var(--muted);margin-right:8px">Anteprima:</span>
+      <span id="frac-preview" style="font-family:'Playfair Display',serif;font-size:1.2rem"></span>
     </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeModalDirect('formula-modal')">Annulla</button>
-      <button class="btn btn-primary" onclick="confirmFormula()">Inserisci ✓</button>
+    <div class="modal-actions" style="justify-content:center">
+      <button class="btn btn-secondary" onclick="closeModalDirect('frac-modal')">Annulla</button>
+      <button class="btn btn-primary" onclick="confirmFrac()">Inserisci ✓</button>
     </div>
   </div>
 </div>
@@ -649,89 +600,97 @@ let activeTopicTab = 'cards';
 
 // ── RTE ───────────────────────────────────────────────────────────────────────
 const RTE_TOOLS = [
-  {cmd:'bold',label:'<b>B</b>'},{cmd:'italic',label:'<i>I</i>'},{cmd:'underline',label:'<u>U</u>'},
-  {sep:true},{cmd:'insertUnorderedList',label:'• Lista'},{cmd:'insertOrderedList',label:'1. Lista'},
-  {sep:true},{cmd:'justifyLeft',label:'⬛◻◻'},{cmd:'justifyCenter',label:'◻⬛◻'},{cmd:'justifyRight',label:'◻◻⬛'},
-  {sep:true},{cmd:'superscript',label:'x²',title:'Apice'},{cmd:'subscript',label:'x₂',title:'Pedice'},
-  {sep:true},{special:'fraction',label:'a/b',title:'Frazione'},{special:'formula',label:'∑',title:'Formula matematica'},
-  {sep:true},{cmd:'removeFormat',label:'✕'}
+  {cmd:'bold',label:'B',style:'font-weight:800'},{cmd:'italic',label:'I',style:'font-style:italic'},{cmd:'underline',label:'U',style:'text-decoration:underline'},
+  {sep:true},{cmd:'insertUnorderedList',label:'&#8226; Lista'},{cmd:'insertOrderedList',label:'1. Lista'},
+  {sep:true},{cmd:'justifyLeft',label:'&#8676;'},{cmd:'justifyCenter',label:'&#8596;'},{cmd:'justifyRight',label:'&#8677;'},
+  {sep:true},{cmd:'superscript',label:'x&#178;',title:'Apice'},{cmd:'subscript',label:'x&#8322;',title:'Pedice'},{special:'fraction',label:'a/b',title:'Frazione'},
+  {sep:true},{cmd:'removeFormat',label:'&#10005;'}
 ];
 function buildToolbar(tbId, edId) {
-  document.getElementById(tbId).innerHTML = RTE_TOOLS.map(t=>{
+  document.getElementById(tbId).innerHTML = RTE_TOOLS.map(function(t){
     if(t.sep) return '<div class="rte-sep"></div>';
-    if(t.special==='fraction') return `<button class="rte-btn" title="${t.title}" onmousedown="event.preventDefault();insertFraction('${edId}')">${t.label}</button>`;
-    if(t.special==='formula') return `<button class="rte-btn" title="${t.title}" onmousedown="event.preventDefault();insertFormula('${edId}')">${t.label}</button>`;
-    return `<button class="rte-btn" title="${t.title||t.label}" onmousedown="event.preventDefault();execRTE('${t.cmd}','${edId}')">${t.label}</button>`;
+    var st = t.style ? ' style="'+t.style+'"' : '';
+    if(t.special==='fraction') return '<button class="rte-btn" title="Frazione" onmousedown="event.preventDefault();insertFraction(''+edId+'')">a/b</button>';
+    return '<button class="rte-btn"'+st+' title="'+(t.title||t.label)+'" onmousedown="event.preventDefault();execRTE(''+t.cmd+'',''+edId+'')">'+t.label+'</button>';
   }).join('');
+  setupAutoFraction(edId);
 }
 
-let formulaTargetEditor = null;
+let fracTargetEditor = null;
 
-function insertFraction(edId) { openFormulaModal(edId); }
-function insertFormula(edId) { openFormulaModal(edId); }
-
-function openFormulaModal(edId){
-  formulaTargetEditor = edId;
-  document.getElementById('formula-input').value = '';
-  document.getElementById('formula-preview').textContent = 'Anteprima formula...';
-  document.getElementById('formula-modal').style.display = 'flex';
-  setTimeout(()=>document.getElementById('formula-input').focus(), 100);
+function insertFraction(edId) {
+  fracTargetEditor = edId;
+  document.getElementById('frac-num').value = '';
+  document.getElementById('frac-den').value = '';
+  document.getElementById('frac-preview').innerHTML = '';
+  document.getElementById('frac-modal').style.display = 'flex';
+  setTimeout(()=>document.getElementById('frac-num').focus(), 100);
 }
 
-function insertSym(s){
-  const input = document.getElementById('formula-input');
-  const pos = input.selectionStart;
-  input.value = input.value.slice(0,pos) + s + input.value.slice(input.selectionEnd);
-  input.selectionStart = input.selectionEnd = pos + s.length;
-  input.focus();
-  updateFormulaPreview();
+function updateFracPreview() {
+  const num = document.getElementById('frac-num').value || '■';
+  const den = document.getElementById('frac-den').value || '■';
+  document.getElementById('frac-preview').innerHTML =
+    '<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.2">' +
+    '<span style="border-bottom:2px solid currentColor;padding:0 4px;font-size:0.95em">' + num + '</span>' +
+    '<span style="padding:0 4px;font-size:0.95em">' + den + '</span></span>';
 }
 
-function insertTemplate(type){
-  const input = document.getElementById('formula-input');
-  const sel = input.value.slice(input.selectionStart, input.selectionEnd) || 'x';
-  const pos = input.selectionStart;
-  let insert = '';
-  if(type==='frac') insert = sel+'/';
-  else if(type==='sup') insert = sel+'²';
-  else if(type==='sub') insert = sel+'₀';
-  else if(type==='sqrt') insert = '√('+sel+')';
-  else if(type==='supsub') insert = sel+'₀²';
-  input.value = input.value.slice(0,pos) + insert + input.value.slice(input.selectionEnd);
-  input.selectionStart = input.selectionEnd = pos + insert.length;
-  input.focus();
-  updateFormulaPreview();
-}
-
-function updateFormulaPreview(){
-  const val = document.getElementById('formula-input').value;
-  const preview = document.getElementById('formula-preview');
-  if(!val){ preview.textContent = 'Anteprima formula...'; return; }
-  // Convert simple fraction notation a/b to visual fraction
-  let display = val.replace(/([^/\s]+)\/([^/\s]+)/g, '<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 4px;line-height:1.1"><span style="border-bottom:1.5px solid currentColor;padding:0 3px;font-size:0.9em">$1</span><span style="padding:0 3px;font-size:0.9em">$2</span></span>');
-  preview.innerHTML = display;
-}
-
-function confirmFormula(){
-  const val = document.getElementById('formula-input').value.trim();
-  if(!val){ toast('Scrivi una formula!'); return; }
-  const ed = document.getElementById(formulaTargetEditor);
-  if(!ed){ closeModalDirect('formula-modal'); return; }
+function confirmFrac() {
+  const num = document.getElementById('frac-num').value.trim();
+  const den = document.getElementById('frac-den').value.trim();
+  if(!num || !den) { toast('Inserisci numeratore e denominatore!'); return; }
+  const ed = document.getElementById(fracTargetEditor);
+  if(!ed) { closeModalDirect('frac-modal'); return; }
   ed.focus();
-  // Convert a/b fractions to visual HTML
-  let html = val.replace(/([^/\s]+)\/([^/\s]+)/g,
-    '<span class="math-frac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px;line-height:1.2"><span style="border-bottom:1.5px solid currentColor;padding:0 2px;font-size:0.85em">$1</span><span style="padding:0 2px;font-size:0.85em">$2</span></span>');
-  document.execCommand('insertHTML', false, '<span class="math-formula" style="font-family:'Playfair Display',serif">'+html+'</span>&nbsp;');
-  closeModalDirect('formula-modal');
+  const html = '<span class="math-frac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px;line-height:1.2"><span style="border-bottom:1.5px solid currentColor;padding:0 2px;font-size:0.85em">' + num + '</span><span style="padding:0 2px;font-size:0.85em">' + den + '</span></span>';
+  document.execCommand('insertHTML', false, html + '&nbsp;');
+  closeModalDirect('frac-modal');
 }
 
-function rerenderMath(el) {
-  if(window.MathJax && MathJax.typesetPromise) {
-    MathJax.typesetClear([el]);
-    MathJax.typesetPromise([el]).catch(err=>console.log(err));
-  }
-}
 function execRTE(cmd,id){document.getElementById(id).focus();document.execCommand(cmd,false,null);}
+
+
+
+function setupAutoFraction(edId) {
+  var ed = document.getElementById(edId);
+  if (!ed || ed._fracSetup) return;
+  ed._fracSetup = true;
+  ed.addEventListener('keydown', function(e) {
+    if (e.key !== ' ' && e.key !== 'Enter') return;
+    var sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    var range = sel.getRangeAt(0);
+    var node = range.startContainer;
+    if (node.nodeType !== 3) return;
+    var text = node.textContent;
+    var pos = range.startOffset;
+    var textBefore = text.slice(0, pos);
+    var slashIdx = textBefore.lastIndexOf('/');
+    if (slashIdx < 1) return;
+    var afterSlash = textBefore.slice(slashIdx + 1);
+    var beforeSlash = textBefore.slice(0, slashIdx);
+    var numMatch = beforeSlash.match(/([^\s]+)$/);
+    if (!numMatch || !afterSlash) return;
+    var num = numMatch[1];
+    var den = afterSlash;
+    if (!num || !den) return;
+    e.preventDefault();
+    var startPos = pos - num.length - 1 - den.length;
+    var delRange = document.createRange();
+    delRange.setStart(node, startPos);
+    delRange.setEnd(node, pos);
+    delRange.deleteContents();
+    sel.removeAllRanges();
+    sel.addRange(delRange);
+    var topStyle = 'display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px;line-height:1.2';
+    var numStyle = 'border-bottom:1.5px solid currentColor;padding:0 2px;font-size:0.85em';
+    var denStyle = 'padding:0 2px;font-size:0.85em';
+    var h = '<span style="' + topStyle + '"><span style="' + numStyle + '">' + num + '</span><span style="' + denStyle + '">' + den + '</span></span> ';
+    document.execCommand('insertHTML', false, h);
+  });
+}
+
 function getRTE(id){return document.getElementById(id).innerHTML.trim();}
 function setRTE(id,html){document.getElementById(id).innerHTML=html||'';}
 function clearRTE(id){document.getElementById(id).innerHTML='';}
@@ -946,13 +905,7 @@ function showSessionCard(){
   document.getElementById('fc-front-text').innerHTML=card.front;
   document.getElementById('fc-back-text').innerHTML=card.back;
   applyCardStyle();
-  // Render math formulas
-  setTimeout(()=>{
-    if(window.MathJax&&MathJax.typesetPromise){
-      MathJax.typesetClear([document.getElementById('fc-front-text'),document.getElementById('fc-back-text')]);
-      MathJax.typesetPromise([document.getElementById('fc-front-text'),document.getElementById('fc-back-text')]).catch(e=>console.log(e));
-    }
-  },100);
+
   document.getElementById('fc-subject-f').textContent=(card.deckName+' › '+card.topicName).toUpperCase();
   document.getElementById('fc-subject-b').textContent=(card.deckName+' › '+card.topicName).toUpperCase();
   document.getElementById('sess-flip-actions').style.display='flex';
@@ -1329,7 +1282,7 @@ function openEditModal(id){
   document.getElementById('edit-modal').style.display='flex';
 }
 function closeModal(id,e){if(e.target===document.getElementById(id))closeModalDirect(id);}
-function closeModalDirect(id){document.getElementById(id).style.display='none';if(id==='edit-modal')editingCardId=null;if(id==='pdf-modal')addingPdfTopicId=null;if(id==='formula-modal')formulaTargetEditor=null;}
+function closeModalDirect(id){document.getElementById(id).style.display='none';if(id==='edit-modal')editingCardId=null;if(id==='pdf-modal')addingPdfTopicId=null;if(id==='frac-modal')fracTargetEditor=null;}
 async function saveEdit(){
   if(!editingCardId)return;
   const front=getRTE('edit-front'),back=getRTE('edit-back');
@@ -1492,9 +1445,7 @@ function applyCardStyle(){
   }
 }
 
-function updateBoldStyle(frontBold, backBold){
-  let el = document.getElementById('bold-style-tag');
-  if(!el){ el=document.createElement('style'); el.id='bold-style-tag'; document.head.appendChild(el); }
+
   el.textContent = `#fc .fc-front b, #fc .fc-front strong { font-weight:700; color:${frontBold}; } #fc .fc-back b, #fc .fc-back strong { font-weight:700; color:${backBold}; }`;
 }
 
@@ -1549,6 +1500,13 @@ function selectStyle(key){
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+  ['frac-num','frac-den'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter')confirmFrac();});
+  });
+});
+
 function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}}
 let toastTimer;
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2400);}
