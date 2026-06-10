@@ -591,6 +591,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const COLORS = ['#c84b2f','#2f6bc8','#2a7a4b','#b85ad4','#d4882a','#2ab8b8'];
 let CODES = { student: 'STUDIA2025', admin: 'ADMIN2025' };
 let role = null, decks = [], sessionCount = 5, selectedColor = COLORS[0];
+let currentUserCode = '';
 let sessionCards = [], sessionIdx = 0, sessionCorrect = 0, sessionWrong = 0, sessionKeptOut = [];
 let isFlipped = false, browseFilter = 'all', selectedRole = 'student';
 let currentDeckId = null, currentTopicId = null;
@@ -660,6 +661,7 @@ async function tryLogin(){
   if(selectedRole==='admin'&&code===CODES.admin) role='admin';
   else if(selectedRole==='student'&&code===CODES.student) role='student';
   else{err.textContent='Codice non corretto.';document.getElementById('login-input').value='';return;}
+  currentUserCode = code;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('loader').style.display='flex';
   await loadAll();
@@ -688,20 +690,38 @@ async function updateCode(type){
 
 // ── DB ────────────────────────────────────────────────────────────────────────
 async function loadAll(){
-  const[{data:dr},{data:tr},{data:cr},{data:pr}]=await Promise.all([
+  const[{data:dr},{data:tr},{data:cr},{data:pr},{data:ubr}]=await Promise.all([
     sb.from('decks').select('*').order('created_at'),
     sb.from('topics').select('*').order('created_at'),
     sb.from('cards').select('*').order('created_at'),
     sb.from('pdfs').select('*').order('created_at'),
+    sb.from('user_boxes').select('*').eq('user_code', currentUserCode),
   ]);
+  // Build a set of card IDs in this user's box
+  const boxSet = new Set((ubr||[]).filter(r=>r.in_box).map(r=>r.card_id));
+  // If user has no box entries yet, initialize from global in_box
+  const hasBox = (ubr||[]).length > 0;
   decks=(dr||[]).map(d=>({
     ...d,
     topics:(tr||[]).filter(t=>t.deck_id===d.id).map(t=>({
       ...t,
-      cards:(cr||[]).filter(c=>c.topic_id===t.id).map(c=>({id:c.id,front:c.front,back:c.back,in_box:c.in_box})),
+      cards:(cr||[]).filter(c=>c.topic_id===t.id).map(c=>({
+        id:c.id,front:c.front,back:c.back,
+        in_box: hasBox ? boxSet.has(c.id) : c.in_box
+      })),
       pdfs:(pr||[]).filter(p=>p.topic_id===t.id).map(p=>({id:p.id,name:p.name,url:p.url}))
     }))
   }));
+  // If first time, init user box from global
+  if(!hasBox){
+    const allCards = (cr||[]);
+    const toInsert = allCards.filter(c=>c.in_box).map(c=>({
+      id: crypto.randomUUID(), user_code: currentUserCode, card_id: c.id, in_box: true
+    }));
+    if(toInsert.length > 0){
+      await sb.from('user_boxes').insert(toInsert);
+    }
+  }
 }
 
 function allCards(){return decks.flatMap(d=>d.topics.flatMap(t=>t.cards.map(c=>({...c,deckId:d.id,deckName:d.name,topicId:t.id,topicName:t.name}))));}
@@ -816,8 +836,9 @@ function launchSession(cards){
   showSessionCard();
 }
 async function resetBox(){
-  if(!confirm('Rimettere TUTTE le carte nella scatola?'))return;
-  await sb.from('cards').update({in_box:true}).neq('id','00000000-0000-0000-0000-000000000000');
+  if(!confirm('Rimettere TUTTE le carte nella tua scatola personale?'))return;
+  // Delete user box entries so they get re-initialized from global on next load
+  await sb.from('user_boxes').delete().eq('user_code',currentUserCode);
   await loadAll();renderHome();toast('📦 Scatola resettata!');
 }
 
@@ -868,7 +889,7 @@ function unflipFC(){document.getElementById('fc').classList.remove('flipped');is
 function rateCorrect(){sessionCorrect++;document.getElementById('rate-btns').style.display='none';document.getElementById('after-correct').style.display='block';}
 async function keepOut(){
   const card=sessionCards[sessionIdx];
-  await sb.from('cards').update({in_box:false}).eq('id',card.id);
+  await upsertUserBox(card.id,false);
   decks.forEach(d=>d.topics.forEach(t=>{const c=t.cards.find(x=>x.id===card.id);if(c)c.in_box=false;}));
   sessionKeptOut.push(card);toast('✓ Carta rimossa dalla scatola');nextCard();
 }
@@ -890,7 +911,7 @@ function showResults(){
 }
 async function remetteTutte(){
   const ids=sessionKeptOut.map(c=>c.id);if(!ids.length)return;
-  await sb.from('cards').update({in_box:true}).in('id',ids);
+  for(const id of ids) await upsertUserBox(id,true);
   decks.forEach(d=>d.topics.forEach(t=>t.cards.forEach(c=>{if(ids.includes(c.id))c.in_box=true;})));
   sessionKeptOut=[];document.getElementById('res-box').textContent=boxCards().length;
   document.getElementById('res-remette-option').style.display='none';toast('↩ Tutte rimesse nella scatola');
@@ -934,7 +955,7 @@ function renderBrowse(){
 function setBrowseFilter(id){browseFilter=id;browseTopicFilter='all-topics';renderBrowse();}
 function setBrowseTopicFilter(id){browseTopicFilter=id;renderBrowse();}
 async function toggleCardBox(id,inBox){
-  await sb.from('cards').update({in_box:inBox}).eq('id',id);
+  await upsertUserBox(id,inBox);
   decks.forEach(d=>d.topics.forEach(t=>{const c=t.cards.find(x=>x.id===id);if(c)c.in_box=inBox;}));
   toast(inBox?'📥 Aggiunta alla scatola':'📤 Rimossa dalla scatola');renderBrowse();
 }
@@ -1121,9 +1142,9 @@ function renderCardsList(topicId){
         <span class="ci-box">${c.in_box?'📦 In scatola':'✓ Fuori scatola'}</span>
       </div>
       <div class="ci-actions">
-        <button class="icon-btn" onclick="openEditModal('${c.id}')">✏️</button>
+        ${role==='admin'?`<button class="icon-btn" onclick="openEditModal('${c.id}')">✏️</button>`:''}
         ${c.in_box?`<button class="icon-btn" onclick="toggleCardBox2('${c.id}',false,'${topicId}')">📤</button>`:`<button class="icon-btn" onclick="toggleCardBox2('${c.id}',true,'${topicId}')">📥</button>`}
-        <button class="icon-btn del" onclick="delCard('${c.id}','${topicId}')">🗑</button>
+        ${role==='admin'?`<button class="icon-btn del" onclick="delCard('${c.id}','${topicId}')">🗑</button>`:''}
       </div>
     </div>`).join('');
 }
@@ -1149,7 +1170,7 @@ async function delCard(id,topicId){
 }
 
 async function toggleCardBox2(id,inBox,topicId){
-  await sb.from('cards').update({in_box:inBox}).eq('id',id);
+  await upsertUserBox(id,inBox);
   decks.forEach(d=>d.topics.forEach(t=>{const c=t.cards.find(x=>x.id===id);if(c)c.in_box=inBox;}));
   toast(inBox?'📥 Aggiunta alla scatola':'📤 Rimossa dalla scatola');
   renderCardsList(topicId);
@@ -1394,17 +1415,29 @@ function applyCardStyle(){
 function renderStyleSection(){
   const grid = document.getElementById('style-grid');
   if(!grid) return;
-  grid.innerHTML = Object.entries(CARD_STYLES).map(([key,s])=>`
-    <div class="style-tile ${currentStyle===key?'selected':''}" onclick="selectStyle('${key}')">
-      <div class="style-check">✓</div>
-      <div class="style-tile-name">${s.name}</div>
-      <div class="style-mini ${s.frontClass}" style="font-size:12px;line-height:1.5;color:${key==='c'?'#aaa':'#555'}">
-        ${s.accent?'<div class="fc-style-b-accent"></div>':''}
-        <div style="padding-left:${s.accent?'10px':'0'};font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:${key==='c'?'#c4824a':'#B5640A'};margin-bottom:3px">Letteratura › Montale</div>
-        <span class="${s.textClass}" style="font-size:12px">1925 pubblica <b>Ossi di Seppia</b></span>
-      </div>
-      <div style="font-size:11px;color:var(--muted);margin-top:6px">${s.desc}</div>
-    </div>`).join('');
+  const styleDefs = {
+    a:{bg:'#ffffff',brd:'1.5px solid #ddd5c8',tc:'#444',bold:'#1a1410',subj:'#8a7f72',ff:'Outfit,sans-serif',ac:null},
+    b:{bg:'#ffffff',brd:'1.5px solid #ddd5c8',tc:'#555',bold:'#1a1410',subj:'#B5640A',ff:'Playfair Display,serif',ac:'#E8943A'},
+    c:{bg:'#1e1c19',brd:'1.5px solid #3a3730',tc:'#aaa',bold:'#f5f0e8',subj:'#c4824a',ff:'Outfit,sans-serif',ac:null},
+    d:{bg:'#ffffff',brd:'2px solid #1a1410',tc:'#555',bold:'#1a1410',subj:'#8a7f72',ff:'Playfair Display,serif',ac:null}
+  };
+  grid.innerHTML = Object.entries(CARD_STYLES).map(function(entry){
+    var key=entry[0], s=entry[1], sd=styleDefs[key];
+    var sel=currentStyle===key?'selected':'';
+    var acHtml=sd.ac?('<div style="position:absolute;top:0;left:0;width:3px;height:100%;background:'+sd.ac+'"></div>'):'';
+    var pl=sd.ac?'padding-left:14px;':'';
+    var miniStyle='background:'+sd.bg+';border:'+sd.brd+';border-radius:8px;padding:10px 12px;min-height:60px;position:relative;overflow:hidden;'+pl;
+    var textHtml='<div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:'+sd.subj+';margin-bottom:3px">Letteratura</div>'
+      +'<span style="font-size:12px;color:'+sd.tc+'">1925 pubblica <b style="font-weight:700;color:'+sd.bold+'">Ossi di Seppia</b></span>';
+    var div=document.createElement('div');
+    div.className='style-tile '+sel;
+    div.setAttribute('onclick','selectStyle("'+key+'")');
+    div.innerHTML='<div class="style-check">&#10003;</div>'
+      +'<div class="style-tile-name">'+s.name+'</div>'
+      +'<div class="style-mini" style="'+miniStyle+'">'+acHtml+textHtml+'</div>'
+      +'<div style="font-size:11px;color:var(--muted);margin-top:6px">'+s.desc+'</div>';
+    return div.outerHTML;
+  }).join('');
   renderStylePreview();
 }
 
@@ -1439,6 +1472,14 @@ function selectStyle(key){
   renderStyleSection();
   applyCardStyle();
   toast('🎨 Stile aggiornato!');
+}
+
+// ── USER BOX HELPERS ─────────────────────────────────────────────────────────
+async function upsertUserBox(cardId, inBox){
+  await sb.from('user_boxes').upsert(
+    {id: crypto.randomUUID(), user_code: currentUserCode, card_id: cardId, in_box: inBox},
+    {onConflict: 'user_code,card_id'}
+  );
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
