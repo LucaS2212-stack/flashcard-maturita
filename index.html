@@ -143,17 +143,17 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .fc.flipped { transform: rotateY(180deg); }
 .fc-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 22px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; padding: 24px 32px 24px 32px; text-align: left; overflow: hidden; transform: rotateY(0deg); }
 .fc-front { background: var(--surface); border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); }
-.fc-back { background: #2e2b26; transform: rotateY(180deg); }
+.fc-back { transform: rotateY(180deg); }
 .fc-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 6px; color: var(--muted); font-weight: 600; flex-shrink: 0; }
-.fc-back .fc-tag { color: rgba(255,255,255,0.5); }
+
 .fc-subject { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); font-weight: 600; margin-bottom: 2px; flex-shrink: 0; }
-.fc-back .fc-subject { color: #e8b090; }
+
 .fc-content { font-family: 'Playfair Display', serif; font-size: clamp(0.88rem, 2vw, 1.1rem); line-height: 1.6; color: var(--ink); overflow-y: auto; flex: 1; width: 100%; text-align: left; margin-top: 6px; }
-.fc-back .fc-content { color: #f0ece4; }
+.fc-back .fc-content { }
 .fc-content ul, .fc-content ol { padding-left: 1.4em; }
 .fc-content li { margin-bottom: 2px; }
 .fc-hint { margin-top: 10px; font-size: 0.78rem; color: var(--muted); flex-shrink: 0; }
-.fc-back .fc-hint { color: rgba(255,255,255,0.3); }
+
 
 /* PROGRESS */
 .session-progress { margin-bottom: 20px; }
