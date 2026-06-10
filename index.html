@@ -141,14 +141,14 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
 .fc-wrap { perspective: 1400px; margin: 0 auto 24px; max-width: 680px; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); }
 .fc { width: 100%; aspect-ratio: 16/9; position: relative; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); cursor: pointer; border-radius: 22px; }
 .fc.flipped { transform: rotateY(180deg); }
-.fc-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 22px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; padding: 24px 32px 24px 32px; text-align: left; overflow: hidden; transform: rotateY(0deg); }
+.fc-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 22px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; padding-top: 24px; padding-right: 32px; padding-bottom: 24px; padding-left: 32px; text-align: left; overflow: hidden; transform: rotateY(0deg); }
 .fc-front { background: var(--surface); border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); }
 .fc-back { transform: rotateY(180deg); }
 .fc-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 6px; color: var(--muted); font-weight: 600; flex-shrink: 0; }
 
 .fc-subject { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); font-weight: 600; margin-bottom: 2px; flex-shrink: 0; }
 
-.fc-content { font-family: 'Playfair Display', serif; font-size: clamp(0.88rem, 2vw, 1.1rem); line-height: 1.6; color: var(--ink); overflow-y: auto; flex: 1; width: 100%; text-align: left; margin-top: 6px; }
+.fc-content { font-family: 'Playfair Display', serif; line-height: 1.6; color: var(--ink); overflow-y: auto; flex: 1; width: 100%; text-align: left; margin-top: 6px; }
 .fc-back .fc-content { }
 .fc-content ul, .fc-content ol { padding-left: 1.4em; }
 .fc-content li { margin-bottom: 2px; }
@@ -405,7 +405,7 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95)
         <div style="text-align:right"><div class="box-count" id="box-count">0</div><div class="box-label">carte</div></div>
       </div>
       <div class="box-actions">
-        <button class="btn btn-secondary btn-sm" id="btn-reset-box" onclick="resetBox()" style="display:none">↺ Reset</button>
+        <button class="btn btn-secondary btn-sm" id="btn-reset-box" onclick="resetBox()">↺ Reset</button>
       </div>
     </div>
 
@@ -675,7 +675,7 @@ function applyRole(){
   document.getElementById('admin-badge').style.display=a?'block':'none';
   document.getElementById('nav-mazzi').style.display=a?'':'none';
   document.getElementById('nav-backup').style.display=a?'':'none';
-  document.getElementById('btn-reset-box').style.display=a?'':'none';
+
 }
 function logout(){role=null;document.getElementById('app').style.display='none';document.getElementById('login-screen').style.display='flex';document.getElementById('login-input').value='';document.getElementById('login-error').textContent='';selectRole('student');}
 
@@ -837,8 +837,15 @@ function launchSession(cards){
 }
 async function resetBox(){
   if(!confirm('Rimettere TUTTE le carte nella tua scatola personale?'))return;
-  // Delete user box entries so they get re-initialized from global on next load
+  // Get all card IDs
+  const allCardIds = decks.flatMap(d=>d.topics.flatMap(t=>t.cards.map(c=>c.id)));
+  // Delete existing entries for this user
   await sb.from('user_boxes').delete().eq('user_code',currentUserCode);
+  // Re-insert all cards as in_box=true
+  if(allCardIds.length>0){
+    const rows = allCardIds.map(id=>({id:crypto.randomUUID(),user_code:currentUserCode,card_id:id,in_box:true}));
+    await sb.from('user_boxes').insert(rows);
+  }
   await loadAll();renderHome();toast('📦 Scatola resettata!');
 }
 
@@ -1445,25 +1452,28 @@ function renderStylePreview(){
   const s = CARD_STYLES[currentStyle];
   const preview = document.getElementById('style-preview');
   if(!preview) return;
-  preview.innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="fc-face ${s.frontClass}" style="position:relative;border-radius:16px;padding:20px 24px;min-height:140px;overflow:hidden">
-        ${s.accent?'<div class="fc-style-b-accent"></div>':''}
-        <div style="padding-left:${s.accent?'10px':'0'}">
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;${s.subjectClass?'color:#B5640A':'color:#8a7f72'};margin-bottom:3px">Letteratura › Montale</div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#aaa;margin-bottom:8px">Domanda</div>
-          <div class="${s.textClass}" style="font-size:13px">La vita di Montale</div>
-        </div>
-      </div>
-      <div class="fc-face ${s.backClass}" style="position:relative;border-radius:16px;padding:20px 24px;min-height:140px;overflow:hidden">
-        ${s.accent?'<div class="fc-style-b-accent"></div>':''}
-        <div style="padding-left:${s.accent?'10px':'0'}">
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;${s.subjectClass?'color:#B5640A':(s.invertBack?'color:rgba(255,255,255,0.4)':'color:#8a7f72')};margin-bottom:3px">Letteratura › Montale</div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;${s.invertBack?'color:rgba(255,255,255,0.25)':(s.tagClass?'color:#6b6760':'color:#aaa')};margin-bottom:8px">Risposta</div>
-          <div class="${s.textBackClass}" style="font-size:12px"><ul style="padding-left:1.2em"><li>1896 nasce a Genova</li><li>1925 pubblica <b>Ossi di Seppia</b></li><li>1975 <b>Premio Nobel</b></li></ul></div>
-        </div>
-      </div>
-    </div>`;
+  const pd = {
+    a:{fg:'#fff',fb:'1.5px solid #ddd5c8',bg:'#f7f5f0',bb:'1.5px solid #ddd5c8',tc:'#444',tb:'#444',bold:'#1a1410',subj:'#8a7f72',tag:'#aaa',subjB:'#8a7f72',tagB:'#aaa',ac:null},
+    b:{fg:'#fff',fb:'1.5px solid #ddd5c8',bg:'#faf8f3',bb:'1.5px solid #ddd5c8',tc:'#555',tb:'#555',bold:'#1a1410',subj:'#B5640A',tag:'#aaa',subjB:'#B5640A',tagB:'#aaa',ac:'#E8943A'},
+    c:{fg:'#1e1c19',fb:'1.5px solid #3a3730',bg:'#252320',bb:'1.5px solid #3a3730',tc:'#aaa',tb:'#aaa',bold:'#f5f0e8',subj:'#c4824a',tag:'#6b6760',subjB:'#c4824a',tagB:'#6b6760',ac:null},
+    d:{fg:'#fff',fb:'2px solid #1a1410',bg:'#1a1410',bb:'2px solid #1a1410',tc:'#555',tb:'#c8c0b0',bold:'#1a1410',boldB:'#fff',subj:'#8a7f72',tag:'#aaa',subjB:'rgba(255,255,255,0.4)',tagB:'rgba(255,255,255,0.25)',ac:null}
+  }[currentStyle];
+  var acHtml=pd.ac?'<div style="position:absolute;top:0;left:0;width:3px;height:100%;background:'+pd.ac+'"></div>':'';
+  var pl=pd.ac?'14px':'0px';
+  preview.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+    +'<div style="position:relative;border-radius:16px;padding:16px 20px 16px '+pl+';min-height:140px;overflow:hidden;background:'+pd.fg+';border:'+pd.fb+'">'
+    +acHtml
+    +'<div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:'+pd.subj+';margin-bottom:3px">Letteratura › Montale</div>'
+    +'<div style="font-size:10px;color:'+pd.tag+';margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Domanda</div>'
+    +'<div style="font-size:13px;color:'+pd.tc+'">La vita di Montale</div>'
+    +'</div>'
+    +'<div style="position:relative;border-radius:16px;padding:16px 20px 16px '+pl+';min-height:140px;overflow:hidden;background:'+pd.bg+';border:'+pd.bb+'">'
+    +acHtml
+    +'<div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:'+pd.subjB+';margin-bottom:3px">Letteratura › Montale</div>'
+    +'<div style="font-size:10px;color:'+pd.tagB+';margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Risposta</div>'
+    +'<ul style="padding-left:1.2em;font-size:12px;color:'+pd.tb+'"><li>1896 nasce a Genova</li><li>1925 pubblica <b style="font-weight:700;color:'+(pd.boldB||pd.bold)+'">Ossi di Seppia</b></li><li>1975 <b style="font-weight:700;color:'+(pd.boldB||pd.bold)+'">Premio Nobel</b></li></ul>'
+    +'</div>'
+    +'</div>';
 }
 
 function selectStyle(key){
